@@ -11,6 +11,7 @@ public static partial class DelayGetValue
 		public required string Name { get; init; }
 		public required TaskCompletionSource CompletionSource { get; init; }
 		public int TimesExecuted { get; set; }
+		public CancellationToken CancellationToken { get; set; }
 	}
 
 	public sealed record Response(int Value, bool ExecutedHandler, Guid RandomValue);
@@ -19,10 +20,13 @@ public static partial class DelayGetValue
 
 	private static async ValueTask<Response> HandleAsync(
 		Query query,
-		CancellationToken _
+		CancellationToken token
 	)
 	{
+		query.CancellationToken = token;
 		await query.CompletionSource.Task;
+		token.ThrowIfCancellationRequested();
+
 		lock (s_lock)
 			query.TimesExecuted++;
 

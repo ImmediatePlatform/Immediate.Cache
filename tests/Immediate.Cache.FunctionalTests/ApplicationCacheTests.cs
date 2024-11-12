@@ -122,4 +122,24 @@ public sealed class ApplicationCacheTests
 		// ensure both responses get the same response back
 		Assert.Equal(response1.RandomValue, response2.RandomValue);
 	}
+
+	[Test]
+	public async Task ProperlyUsesCancellationToken()
+	{
+		var request = new DelayGetValue.Query()
+		{
+			Value = 4,
+			Name = "Request4",
+			CompletionSource = new(),
+		};
+
+		using var tcs = new CancellationTokenSource();
+		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
+		var responseTask = cache.GetValue(request, tcs.Token);
+
+		await tcs.CancelAsync();
+		request.CompletionSource.SetResult();
+
+		Assert.True(responseTask.IsCanceled);
+	}
 }

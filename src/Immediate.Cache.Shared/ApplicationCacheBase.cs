@@ -86,11 +86,14 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 	/// <param name="request">
 	///		The request payload to be cached.
 	/// </param>
+	/// <param name="cancellationToken">
+	///		The token to monitor for cancellation requests. The default value is <see cref="CancellationToken.None"/>.
+	/// </param>
 	/// <returns>
 	///		The response payload from executing the handler.
 	/// </returns>
-	public ValueTask<TResponse> GetValue(TRequest request) =>
-		GetCacheValue(request).GetValue();
+	public ValueTask<TResponse> GetValue(TRequest request, CancellationToken cancellationToken = default) =>
+		GetCacheValue(request).GetValue(cancellationToken);
 
 	/// <summary>
 	///		Sets the value for a particular cache entry, bypassing the execution of the handler.
@@ -124,9 +127,9 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 		private TaskCompletionSource<TResponse>? _responseSource;
 		private readonly Lock _lock = new();
 
-		public async ValueTask<TResponse> GetValue()
+		public async ValueTask<TResponse> GetValue(CancellationToken cancellationToken)
 		{
-			if (!TryAcquireResponseSource())
+			if (!TryAcquireResponseSource(cancellationToken))
 				return await _responseSource.Task.ConfigureAwait(false);
 
 			var token = _tokenSource.Token;
@@ -151,7 +154,7 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 					}
 				}
 			}
-			catch (OperationCanceledException) when (_responseSource is not null)
+			catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && _responseSource is not null)
 			{
 				return await _responseSource.Task.ConfigureAwait(false);
 			}
@@ -160,7 +163,7 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 		[MemberNotNull(nameof(_responseSource))]
 		[MemberNotNullWhen(true, nameof(_tokenSource))]
 		[SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "Double-checked lock pattern")]
-		private bool TryAcquireResponseSource()
+		private bool TryAcquireResponseSource(CancellationToken cancellationToken)
 		{
 			if (_responseSource is not null)
 				return false;
@@ -170,7 +173,7 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 				if (_responseSource is not null)
 					return false;
 
-				_tokenSource = new CancellationTokenSource();
+				_tokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 				_responseSource = new TaskCompletionSource<TResponse>();
 				return true;
 			}
