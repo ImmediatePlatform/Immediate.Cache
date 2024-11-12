@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Immediate.Handlers.Shared;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -113,22 +114,20 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 	public void RemoveValue(TRequest request) =>
 		GetCacheValue(request).RemoveValue();
 
+	[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "CancellationTokenSource does not need to be disposed here.")]
 	private sealed class CacheValue(
 		TRequest request,
 		Owned<IHandler<TRequest, TResponse>> handler
 	)
 	{
-		private TResponse? _response;
 		private CancellationTokenSource? _tokenSource;
+		private TaskCompletionSource<TResponse>? _responseSource;
 		private readonly object _lock = new();
 
 		public async ValueTask<TResponse> GetValue()
 		{
-			if (_response is not null)
-				return _response;
-
-			lock (_lock)
-				_tokenSource ??= new CancellationTokenSource();
+			if (!TryAcquireResponseSource())
+				return await _responseSource.Task.ConfigureAwait(false);
 
 			var token = _tokenSource.Token;
 
@@ -146,12 +145,34 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 						.ConfigureAwait(false);
 
 					lock (_lock)
-						return _response ??= response;
+					{
+						_responseSource.SetResult(response);
+						return response;
+					}
 				}
 			}
-			catch (OperationCanceledException) when (_response is not null)
+			catch (OperationCanceledException) when (_responseSource is not null)
 			{
-				return _response;
+				return await _responseSource.Task.ConfigureAwait(false);
+			}
+		}
+
+		[MemberNotNull(nameof(_responseSource))]
+		[MemberNotNullWhen(true, nameof(_tokenSource))]
+		[SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "Double-checked lock pattern")]
+		private bool TryAcquireResponseSource()
+		{
+			if (_responseSource is not null)
+				return false;
+
+			lock (_lock)
+			{
+				if (_responseSource is not null)
+					return false;
+
+				_tokenSource = new CancellationTokenSource();
+				_responseSource = new TaskCompletionSource<TResponse>();
+				return true;
 			}
 		}
 
@@ -159,7 +180,8 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 		{
 			lock (_lock)
 			{
-				_response = response;
+				_responseSource = new TaskCompletionSource<TResponse>();
+				_responseSource.SetResult(response);
 				_tokenSource?.Cancel();
 			}
 		}
@@ -168,7 +190,7 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 		{
 			lock (_lock)
 			{
-				_response = null;
+				_responseSource = null;
 				_tokenSource?.Cancel();
 			}
 		}
