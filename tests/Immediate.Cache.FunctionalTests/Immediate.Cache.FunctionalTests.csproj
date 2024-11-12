@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFramework>net8.0</TargetFramework>
+	<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,6 +13,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Immediate.Cache.Shared\Immediate.Cache.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<Using Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0'))"
+		   Alias="Lock"
+		   Include="System.Object" />
   </ItemGroup>
 
 </Project>

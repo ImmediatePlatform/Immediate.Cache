@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFramework>net8.0</TargetFramework>
+	<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
 	<RootNamespace>Immediate.Cache</RootNamespace>
   </PropertyGroup>
 
@@ -9,6 +9,12 @@
     <PackageReference Include="Immediate.Handlers" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<Using Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0'))"
+		   Alias="Lock"
+		   Include="System.Object" />
   </ItemGroup>
 
 </Project>

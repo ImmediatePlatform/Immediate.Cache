@@ -26,7 +26,7 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 	where TRequest : class
 	where TResponse : class
 {
-	private readonly object _lock = new();
+	private readonly Lock _lock = new();
 
 	/// <summary>
 	///	    Transforms a <typeparamref name="TRequest"/> into a cache entry key.
@@ -122,7 +122,7 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 	{
 		private CancellationTokenSource? _tokenSource;
 		private TaskCompletionSource<TResponse>? _responseSource;
-		private readonly object _lock = new();
+		private readonly Lock _lock = new();
 
 		public async ValueTask<TResponse> GetValue()
 		{

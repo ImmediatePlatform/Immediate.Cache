@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFramework>net8.0</TargetFramework>
+	<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
 	<IsPackable>true</IsPackable>
 	<IncludeBuildOutput>false</IncludeBuildOutput>
   </PropertyGroup>
 
   <PropertyGroup Label="Nuget">
 	<Title>Immediate.Cache</Title>
-	<Description>....</Description>
+	<Description></Description>
 
 	<Authors>Immediate.Cache Developers</Authors>
 
@@ -32,6 +32,8 @@
 	<None Include="../../readme.md" Pack="true" PackagePath="/" />
 	<None Include="../Immediate.Cache.Shared/bin/$(Configuration)/net8.0/Immediate.Cache.Shared.dll" Pack="true" PackagePath="lib/net8.0" Visible="true" />
 	<None Include="../Immediate.Cache.Shared/bin/$(Configuration)/net8.0/Immediate.Cache.Shared.xml" Pack="true" PackagePath="lib/net8.0" Visible="true" />
+	<None Include="../Immediate.Cache.Shared/bin/$(Configuration)/net9.0/Immediate.Cache.Shared.dll" Pack="true" PackagePath="lib/net9.0" Visible="true" />
+	<None Include="../Immediate.Cache.Shared/bin/$(Configuration)/net9.0/Immediate.Cache.Shared.xml" Pack="true" PackagePath="lib/net9.0" Visible="true" />
   </ItemGroup>
 
 </Project>

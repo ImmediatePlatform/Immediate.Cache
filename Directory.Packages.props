@@ -9,12 +9,12 @@
 	<PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
 	<PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
 	<PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
-	<PackageVersion Include="TUnit.Engine" Version="0.2.176" />
+	<PackageVersion Include="TUnit.Engine" Version="0.2.212" />
 	<PackageVersion Include="xunit.v3.assert" Version="0.5.0-pre.27" />
   </ItemGroup>
 
   <ItemGroup>
 	<GlobalPackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="All" />
-	<GlobalPackageReference Include="Meziantou.Analyzer" Version="2.0.177" PrivateAssets="All" />
+	<GlobalPackageReference Include="Meziantou.Analyzer" Version="2.0.178" PrivateAssets="All" />
   </ItemGroup>
 </Project>

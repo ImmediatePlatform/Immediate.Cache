@@ -15,7 +15,7 @@ public static partial class DelayGetValue
 
 	public sealed record Response(int Value, bool ExecutedHandler, Guid RandomValue);
 
-	private static readonly object s_lock = new();
+	private static readonly Lock s_lock = new();
 
 	private static async ValueTask<Response> HandleAsync(
 		Query query,
