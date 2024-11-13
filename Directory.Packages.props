@@ -15,6 +15,6 @@
 
   <ItemGroup>
 	<GlobalPackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="All" />
-	<GlobalPackageReference Include="Meziantou.Analyzer" Version="2.0.178" PrivateAssets="All" />
+	<GlobalPackageReference Include="Meziantou.Analyzer" Version="2.0.179" PrivateAssets="All" />
   </ItemGroup>
 </Project>
