@@ -8,26 +8,31 @@
 
   <PropertyGroup Label="Nuget">
 	<Title>Immediate.Cache</Title>
-	<Description></Description>
+	<Description>A collection of classes that simplify caching responses from Immediate.Handlers handlers.</Description>
 
 	<Authors>Immediate.Cache Developers</Authors>
+	<Copyright>© 2024 Immediate.Cache Developers</Copyright>
 
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageReadmeFile>readme.md</PackageReadmeFile>
+	<PackageTags>csharp-sourcegenerator;caching;immediate-platform</PackageTags>
 
 	<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	<RepositoryUrl>https://github.com/ImmediatePlatform/Immediate.Cache</RepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Immediate.Handlers" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+	<PackageReference Include="DotNet.ReproducibleBuilds" PrivateAssets="All" />
+	<PackageReference Include="Immediate.Handlers" />
+	<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
+	<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+	<PackageReference Include="MinVer" PrivateAssets="All" />
   </ItemGroup>
 
-  <!--
-	This ensures the library will be packaged as a source generator when we use `dotnet pack`
-	-->
+  <ItemGroup>
+	<ProjectReference Include="../Immediate.Cache.Shared/Immediate.Cache.Shared.csproj" PrivateAssets="All" />
+  </ItemGroup>
+
   <ItemGroup>
 	<None Include="../../readme.md" Pack="true" PackagePath="/" />
 	<None Include="../Immediate.Cache.Shared/bin/$(Configuration)/net8.0/Immediate.Cache.Shared.dll" Pack="true" PackagePath="lib/net8.0" Visible="true" />
@@ -35,5 +40,11 @@
 	<None Include="../Immediate.Cache.Shared/bin/$(Configuration)/net9.0/Immediate.Cache.Shared.dll" Pack="true" PackagePath="lib/net9.0" Visible="true" />
 	<None Include="../Immediate.Cache.Shared/bin/$(Configuration)/net9.0/Immediate.Cache.Shared.xml" Pack="true" PackagePath="lib/net9.0" Visible="true" />
   </ItemGroup>
+
+  <PropertyGroup Label="MinVer">
+	<MinVerAutoIncrement>minor</MinVerAutoIncrement>
+	<MinVerDefaultPreReleaseIdentifiers>preview.0</MinVerDefaultPreReleaseIdentifiers>
+	<MinVerTagPrefix>v</MinVerTagPrefix>
+  </PropertyGroup>
 
 </Project>
