@@ -138,8 +138,91 @@ public sealed class ApplicationCacheTests
 		var responseTask = cache.GetValue(request, tcs.Token);
 
 		await tcs.CancelAsync();
-		request.CompletionSource.SetResult();
 
 		Assert.True(responseTask.IsCanceled);
+	}
+
+	[Test]
+	public async Task CancellingFirstAccessOperatesCorrectly()
+	{
+		using var cts1 = new CancellationTokenSource();
+		var request1 = new DelayGetValue.Query()
+		{
+			Value = 1,
+			Name = "Request1",
+			CompletionSource = new(),
+		};
+
+		using var cts2 = new CancellationTokenSource();
+		var request2 = new DelayGetValue.Query()
+		{
+			Value = 1,
+			Name = "Request2",
+			CompletionSource = new(),
+		};
+
+		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
+		var response1Task = cache.GetValue(request1, cts1.Token);
+		var response2Task = cache.GetValue(request2, cts2.Token);
+
+		// both waiting until cancellation triggered
+		Assert.False(response1Task.IsCompleted);
+		Assert.False(response2Task.IsCompleted);
+
+		Assert.Equal(0, request1.TimesExecuted);
+		Assert.Equal(0, request2.TimesExecuted);
+
+		// cancel query1; query2 should remain uncancelled
+		await cts1.CancelAsync();
+
+		Assert.True(response1Task.IsCanceled);
+		Assert.False(response2Task.IsCanceled);
+
+		await cts2.CancelAsync();
+
+		Assert.True(response1Task.IsCanceled);
+		Assert.True(response2Task.IsCanceled);
+	}
+
+	[Test]
+	public async Task CancellingSecondAccessOperatesCorrectly()
+	{
+		using var cts1 = new CancellationTokenSource();
+		var request1 = new DelayGetValue.Query()
+		{
+			Value = 1,
+			Name = "Request1",
+			CompletionSource = new(),
+		};
+
+		using var cts2 = new CancellationTokenSource();
+		var request2 = new DelayGetValue.Query()
+		{
+			Value = 1,
+			Name = "Request2",
+			CompletionSource = new(),
+		};
+
+		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
+		var response1Task = cache.GetValue(request1, cts1.Token);
+		var response2Task = cache.GetValue(request2, cts2.Token);
+
+		// both waiting until cancellation triggered
+		Assert.False(response1Task.IsCompleted);
+		Assert.False(response2Task.IsCompleted);
+
+		Assert.Equal(0, request1.TimesExecuted);
+		Assert.Equal(0, request2.TimesExecuted);
+
+		// cancel query2; query1 should remain uncancelled
+		await cts2.CancelAsync();
+
+		Assert.False(response1Task.IsCanceled);
+		Assert.True(response2Task.IsCanceled);
+
+		await cts1.CancelAsync();
+
+		Assert.True(response1Task.IsCanceled);
+		Assert.True(response2Task.IsCanceled);
 	}
 }

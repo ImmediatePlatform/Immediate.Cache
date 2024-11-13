@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Immediate.Handlers.Shared;
 using Microsoft.Extensions.Caching.Memory;
@@ -129,11 +130,42 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 
 		public async ValueTask<TResponse> GetValue(CancellationToken cancellationToken)
 		{
-			if (!TryAcquireResponseSource(cancellationToken))
-				return await _responseSource.Task.ConfigureAwait(false);
+			try
+			{
+				return await GetHandlerTask().WaitAsync(cancellationToken).ConfigureAwait(false);
+			}
+			catch (OperationCanceledException) when (
+				!cancellationToken.IsCancellationRequested
+				&& _responseSource?.Task is { IsCompletedSuccessfully: true } task
+			)
+			{
+				return await task.ConfigureAwait(false);
+			}
+		}
 
-			var token = _tokenSource.Token;
+		[SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "Double-checked lock pattern")]
+		private Task<TResponse> GetHandlerTask()
+		{
+			if (_responseSource is not null)
+				return _responseSource.Task;
 
+			lock (_lock)
+			{
+				if (_responseSource is not null)
+					return _responseSource.Task;
+
+				_tokenSource = new();
+				_responseSource = new TaskCompletionSource<TResponse>();
+
+				return Task.Run(() => RunHandler(_tokenSource, _responseSource));
+			}
+		}
+
+		private async Task<TResponse> RunHandler(
+			CancellationTokenSource tokenSource,
+			TaskCompletionSource<TResponse> responseSource
+		)
+		{
 			try
 			{
 				var scope = handler.GetScope();
@@ -143,39 +175,22 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 					var response = await scope.Service
 						.HandleAsync(
 							request,
-							cancellationToken: token
+							tokenSource.Token
 						)
 						.ConfigureAwait(false);
 
 					lock (_lock)
 					{
-						_responseSource.SetResult(response);
+						Debug.Assert(_responseSource == responseSource);
+						responseSource.SetResult(response);
+
 						return response;
 					}
 				}
 			}
-			catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && _responseSource is not null)
+			catch (OperationCanceledException) when (_responseSource is not null)
 			{
 				return await _responseSource.Task.ConfigureAwait(false);
-			}
-		}
-
-		[MemberNotNull(nameof(_responseSource))]
-		[MemberNotNullWhen(true, nameof(_tokenSource))]
-		[SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "Double-checked lock pattern")]
-		private bool TryAcquireResponseSource(CancellationToken cancellationToken)
-		{
-			if (_responseSource is not null)
-				return false;
-
-			lock (_lock)
-			{
-				if (_responseSource is not null)
-					return false;
-
-				_tokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-				_responseSource = new TaskCompletionSource<TResponse>();
-				return true;
 			}
 		}
 
