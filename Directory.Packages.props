@@ -5,7 +5,7 @@
 
   <ItemGroup>
 	<PackageVersion Include="Immediate.Handlers" Version="1.7.0" />
-	<PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="8.0.0" />
+	<PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.0" />
 	<PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
 	<PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
 	<PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
