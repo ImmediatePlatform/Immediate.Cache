@@ -128,8 +128,8 @@ public sealed class ApplicationCacheTests
 	{
 		var request = new DelayGetValue.Query()
 		{
-			Value = 4,
-			Name = "Request4",
+			Value = 1,
+			Name = "Request1",
 			CompletionSource = new(),
 		};
 
@@ -140,6 +140,24 @@ public sealed class ApplicationCacheTests
 		await tcs.CancelAsync();
 
 		Assert.True(responseTask.IsCanceled);
+		Assert.Equal(0, request.TimesExecuted);
+		Assert.False(request.CancellationToken.IsCancellationRequested);
+
+		// actual handler will continue executing in spite of no remaining callers
+		request.CompletionSource.SetResult();
+
+		// check that value is now properly in cache
+		var request2 = new DelayGetValue.Query()
+		{
+			Value = 1,
+			Name = "Request2",
+			CompletionSource = new(),
+		};
+
+		var response = await cache.GetValue(request2);
+
+		Assert.Equal(1, request.TimesExecuted);
+		Assert.Equal(0, request2.TimesExecuted);
 	}
 
 	[Test]
@@ -224,5 +242,54 @@ public sealed class ApplicationCacheTests
 
 		Assert.True(response1Task.IsCanceled);
 		Assert.True(response2Task.IsCanceled);
+	}
+
+	[Test]
+	public async Task RemovingValueCancelsExistingOperation()
+	{
+		var request = new DelayGetValue.Query()
+		{
+			Value = 1,
+			Name = "Request1",
+			CompletionSource = new(),
+		};
+
+		using var tcs = new CancellationTokenSource();
+		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
+		var responseTask = cache.GetValue(request, tcs.Token);
+
+		cache.RemoveValue(request);
+
+		_ = await Assert.ThrowsAnyAsync<OperationCanceledException>(
+			async () => await responseTask
+		);
+
+		Assert.True(responseTask.IsCanceled);
+		Assert.Equal(0, request.TimesExecuted);
+		Assert.True(request.CancellationToken.IsCancellationRequested);
+	}
+
+	[Test]
+	public async Task SettingValueCancelsExistingOperation()
+	{
+		var request = new DelayGetValue.Query()
+		{
+			Value = 1,
+			Name = "Request1",
+			CompletionSource = new(),
+		};
+
+		using var tcs = new CancellationTokenSource();
+		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
+		var responseTask = cache.GetValue(request, tcs.Token);
+
+		cache.SetValue(request, new(5, ExecutedHandler: false, Guid.NewGuid()));
+
+		var response = await responseTask;
+		Assert.Equal(5, response.Value);
+		Assert.False(response.ExecutedHandler);
+
+		Assert.Equal(0, request.TimesExecuted);
+		Assert.True(request.CancellationToken.IsCancellationRequested);
 	}
 }

@@ -18,5 +18,5 @@ public sealed class DelayGetValueCache(
 		Justification = "Not a public method"
 	)]
 	protected override string TransformKey(DelayGetValue.Query request) =>
-		$"GetValue(query: {request.Value})";
+		$"DelayGetValue(query: {request.Value})";
 }
