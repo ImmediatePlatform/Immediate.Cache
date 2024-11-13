@@ -11,7 +11,7 @@ public sealed class ApplicationCacheTests
 	public ApplicationCacheTests()
 	{
 		var services = new ServiceCollection();
-		_ = services.AddHandlers();
+		_ = services.AddImmediateCacheFunctionalTestsHandlers();
 		_ = services.AddSingleton<GetValueCache>();
 		_ = services.AddSingleton<DelayGetValueCache>();
 		_ = services.AddSingleton(typeof(Owned<>));
