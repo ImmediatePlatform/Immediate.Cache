@@ -260,13 +260,18 @@ public sealed class ApplicationCacheTests
 
 		cache.RemoveValue(request);
 
-		_ = await Assert.ThrowsAnyAsync<OperationCanceledException>(
-			async () => await responseTask
-		);
+		// allow IC task to be run
+		await Task.Delay(10);
 
-		Assert.True(responseTask.IsCanceled);
-		Assert.Equal(0, request.TimesExecuted);
-		Assert.True(request.CancellationToken.IsCancellationRequested);
+		request.CompletionSource.SetResult();
+
+		var response = await responseTask;
+
+		Assert.Equal(1, request.TimesExecuted);
+		Assert.Equal(1, request.TimesCancelled);
+
+		Assert.Equal(1, response.Value);
+		Assert.True(response.ExecutedHandler);
 	}
 
 	[Test]
@@ -279,9 +284,11 @@ public sealed class ApplicationCacheTests
 			CompletionSource = new(),
 		};
 
-		using var tcs = new CancellationTokenSource();
 		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
-		var responseTask = cache.GetValue(request, tcs.Token);
+		var responseTask = cache.GetValue(request, default);
+
+		// allow IC task to be run
+		await Task.Delay(10);
 
 		cache.SetValue(request, new(5, ExecutedHandler: false, Guid.NewGuid()));
 
@@ -290,6 +297,6 @@ public sealed class ApplicationCacheTests
 		Assert.False(response.ExecutedHandler);
 
 		Assert.Equal(0, request.TimesExecuted);
-		Assert.True(request.CancellationToken.IsCancellationRequested);
+		Assert.Equal(1, request.TimesCancelled);
 	}
 }
