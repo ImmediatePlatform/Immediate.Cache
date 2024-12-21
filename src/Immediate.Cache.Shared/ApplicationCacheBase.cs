@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using Immediate.Handlers.Shared;
 using Microsoft.Extensions.Caching.Memory;
@@ -128,20 +127,8 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 		private TaskCompletionSource<TResponse>? _responseSource;
 		private readonly Lock _lock = new();
 
-		public async ValueTask<TResponse> GetValue(CancellationToken cancellationToken)
-		{
-			try
-			{
-				return await GetHandlerTask().WaitAsync(cancellationToken).ConfigureAwait(false);
-			}
-			catch (OperationCanceledException) when (
-				!cancellationToken.IsCancellationRequested
-				&& _responseSource?.Task is { IsCompletedSuccessfully: true } task
-			)
-			{
-				return await task.ConfigureAwait(false);
-			}
-		}
+		public async ValueTask<TResponse> GetValue(CancellationToken cancellationToken) =>
+			await GetHandlerTask().WaitAsync(cancellationToken).ConfigureAwait(false);
 
 		[SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "Double-checked lock pattern")]
 		private Task<TResponse> GetHandlerTask()
@@ -154,43 +141,57 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 				if (_responseSource is not null)
 					return _responseSource.Task;
 
-				_tokenSource = new();
-				_responseSource = new TaskCompletionSource<TResponse>();
+				var ts = _tokenSource = new();
+				_responseSource = new();
 
-				return Task.Run(() => RunHandler(_tokenSource, _responseSource));
+				return Task.Run(() => RunHandler(ts));
 			}
 		}
 
-		private async Task<TResponse> RunHandler(
-			CancellationTokenSource tokenSource,
-			TaskCompletionSource<TResponse> responseSource
-		)
+		private async Task<TResponse> RunHandler(CancellationTokenSource tokenSource)
 		{
-			try
+			while (true)
 			{
-				var scope = handler.GetScope();
+				if (_responseSource?.Task is { IsCompletedSuccessfully: true } task)
+					return await task.ConfigureAwait(false);
 
-				await using (scope.ConfigureAwait(false))
+				try
 				{
-					var response = await scope.Service
-						.HandleAsync(
-							request,
-							tokenSource.Token
-						)
-						.ConfigureAwait(false);
+					var token = tokenSource.Token;
+					var scope = handler.GetScope();
 
-					lock (_lock)
+					await using (scope.ConfigureAwait(false))
 					{
-						Debug.Assert(_responseSource == responseSource);
-						responseSource.SetResult(response);
+						var response = await scope.Service
+							.HandleAsync(
+								request,
+								token
+							)
+							.ConfigureAwait(false);
 
-						return response;
+						lock (_lock)
+						{
+							if (!token.IsCancellationRequested)
+							{
+								var rs = _responseSource ??= new();
+								rs.SetResult(response);
+
+								return response;
+							}
+						}
 					}
 				}
-			}
-			catch (OperationCanceledException) when (_responseSource is not null)
-			{
-				return await _responseSource.Task.ConfigureAwait(false);
+				catch (OperationCanceledException) when (tokenSource.IsCancellationRequested)
+				{
+				}
+
+				lock (_lock)
+				{
+					if (_tokenSource is null or { IsCancellationRequested: true })
+						_tokenSource = new();
+
+					tokenSource = _tokenSource;
+				}
 			}
 		}
 
@@ -201,6 +202,7 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 				_responseSource = new TaskCompletionSource<TResponse>();
 				_responseSource.SetResult(response);
 				_tokenSource?.Cancel();
+				_tokenSource = null;
 			}
 		}
 
@@ -210,6 +212,7 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 			{
 				_responseSource = null;
 				_tokenSource?.Cancel();
+				_tokenSource = null;
 			}
 		}
 	}

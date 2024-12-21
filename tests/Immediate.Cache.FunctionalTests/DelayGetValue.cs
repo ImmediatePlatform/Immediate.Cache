@@ -11,6 +11,7 @@ public static partial class DelayGetValue
 		public required string Name { get; init; }
 		public required TaskCompletionSource CompletionSource { get; init; }
 		public int TimesExecuted { get; set; }
+		public int TimesCancelled { get; set; }
 		public CancellationToken CancellationToken { get; set; }
 	}
 
@@ -23,12 +24,21 @@ public static partial class DelayGetValue
 		CancellationToken token
 	)
 	{
-		query.CancellationToken = token;
-		await query.CompletionSource.Task.WaitAsync(token);
+		try
+		{
+			query.CancellationToken = token;
+			await query.CompletionSource.Task.WaitAsync(token);
 
-		lock (s_lock)
-			query.TimesExecuted++;
+			lock (s_lock)
+				query.TimesExecuted++;
 
-		return new(query.Value, ExecutedHandler: true, RandomValue: Guid.NewGuid());
+			return new(query.Value, ExecutedHandler: true, RandomValue: Guid.NewGuid());
+		}
+		catch
+		{
+			lock (s_lock)
+				query.TimesCancelled++;
+			throw;
+		}
 	}
 }
