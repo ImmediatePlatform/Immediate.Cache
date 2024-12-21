@@ -10,8 +10,8 @@
 	<PackageVersion Include="GitHubActionsTestLogger" Version="2.4.1" />
 	<PackageVersion Include="Immediate.Handlers" Version="2.0.0" />
 	<PackageVersion Include="MinVer" Version="6.0.0" />
-	<PackageVersion Include="TUnit.Engine" Version="0.2.212" />
-	<PackageVersion Include="xunit.v3.assert" Version="0.5.0-pre.27" />
+	<PackageVersion Include="TUnit.Engine" Version="0.5.22" />
+	<PackageVersion Include="xunit.v3.assert" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework) == 'net8.0'">
@@ -29,7 +29,7 @@
   </ItemGroup>
 
   <ItemGroup>
-	<GlobalPackageReference Include="PolySharp" Version="1.14.1" PrivateAssets="All" />
-	<GlobalPackageReference Include="Meziantou.Analyzer" Version="2.0.179" PrivateAssets="All" />
+	<GlobalPackageReference Include="PolySharp" Version="1.15.0" PrivateAssets="All" />
+	<GlobalPackageReference Include="Meziantou.Analyzer" Version="2.0.182" PrivateAssets="All" />
   </ItemGroup>
 </Project>
