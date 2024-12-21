@@ -141,10 +141,10 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 				if (_responseSource is not null)
 					return _responseSource.Task;
 
-				_tokenSource = new();
+				var ts = _tokenSource = new();
 				_responseSource = new();
 
-				return Task.Run(() => RunHandler(_tokenSource));
+				return Task.Run(() => RunHandler(ts));
 			}
 		}
 
