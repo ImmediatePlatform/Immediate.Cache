@@ -157,42 +157,40 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 
 				try
 				{
-					return await RunHandlerCore(tokenSource.Token).ConfigureAwait(false);
+					var token = tokenSource.Token;
+					var scope = handler.GetScope();
+
+					await using (scope.ConfigureAwait(false))
+					{
+						var response = await scope.Service
+							.HandleAsync(
+								request,
+								token
+							)
+							.ConfigureAwait(false);
+
+						lock (_lock)
+						{
+							if (!token.IsCancellationRequested)
+							{
+								var rs = _responseSource ??= new();
+								rs.SetResult(response);
+
+								return response;
+							}
+						}
+					}
 				}
 				catch (OperationCanceledException) when (tokenSource.IsCancellationRequested)
 				{
-					lock (_lock)
-					{
-						if (_tokenSource is null or { IsCancellationRequested: true })
-							_tokenSource = new();
-
-						tokenSource = _tokenSource;
-					}
 				}
-			}
-		}
-
-		private async Task<TResponse> RunHandlerCore(CancellationToken token)
-		{
-			var scope = handler.GetScope();
-
-			await using (scope.ConfigureAwait(false))
-			{
-				var response = await scope.Service
-					.HandleAsync(
-						request,
-						token
-					)
-					.ConfigureAwait(false);
 
 				lock (_lock)
 				{
-					token.ThrowIfCancellationRequested();
+					if (_tokenSource is null or { IsCancellationRequested: true })
+						_tokenSource = new();
 
-					var rs = _responseSource ??= new();
-					rs.SetResult(response);
-
-					return response;
+					tokenSource = _tokenSource;
 				}
 			}
 		}
