@@ -35,10 +35,16 @@
 
   <ItemGroup>
 	<None Include="../../readme.md" Pack="true" PackagePath="/" />
-	<None Include="../Immediate.Cache.Shared/bin/$(Configuration)/net8.0/Immediate.Cache.Shared.dll" Pack="true" PackagePath="lib/net8.0" Visible="true" />
-	<None Include="../Immediate.Cache.Shared/bin/$(Configuration)/net8.0/Immediate.Cache.Shared.xml" Pack="true" PackagePath="lib/net8.0" Visible="true" />
-	<None Include="../Immediate.Cache.Shared/bin/$(Configuration)/net9.0/Immediate.Cache.Shared.dll" Pack="true" PackagePath="lib/net9.0" Visible="true" />
-	<None Include="../Immediate.Cache.Shared/bin/$(Configuration)/net9.0/Immediate.Cache.Shared.xml" Pack="true" PackagePath="lib/net9.0" Visible="true" />
+
+	<TfmSpecificPackageFile
+	  Include="../Immediate.Cache.Shared/bin/$(Configuration)/$(TargetFramework)/Immediate.Cache.Shared.dll"
+	  Pack="true"
+	  PackagePath="lib/$(TargetFramework)" />
+
+	<TfmSpecificPackageFile
+	  Include="../Immediate.Cache.Shared/bin/$(Configuration)/$(TargetFramework)/Immediate.Cache.Shared.xml"
+	  Pack="true"
+	  PackagePath="lib/$(TargetFramework)" />
   </ItemGroup>
 
   <PropertyGroup Label="MinVer">
