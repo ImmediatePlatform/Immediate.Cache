@@ -9,10 +9,14 @@ public static partial class DelayGetValue
 	{
 		public required int Value { get; init; }
 		public required string Name { get; init; }
-		public required TaskCompletionSource CompletionSource { get; init; }
 		public int TimesExecuted { get; set; }
 		public int TimesCancelled { get; set; }
 		public CancellationToken CancellationToken { get; set; }
+		public bool ThrowException { get; init; }
+
+		public TaskCompletionSource WaitForTestToContinueOperation { get; } = new();
+		public TaskCompletionSource WaitForTestToStartExecuting { get; } = new();
+		public TaskCompletionSource WaitForTestToFinalize { get; } = new();
 	}
 
 	public sealed record Response(int Value, bool ExecutedHandler, Guid RandomValue);
@@ -24,10 +28,14 @@ public static partial class DelayGetValue
 		CancellationToken token
 	)
 	{
+		if (query.ThrowException)
+			throw new InvalidOperationException($"Test Exception {query.Value}");
+
 		try
 		{
 			query.CancellationToken = token;
-			await query.CompletionSource.Task.WaitAsync(token);
+			_ = query.WaitForTestToStartExecuting.TrySetResult();
+			await query.WaitForTestToContinueOperation.Task.WaitAsync(token);
 
 			lock (s_lock)
 				query.TimesExecuted++;
@@ -39,6 +47,10 @@ public static partial class DelayGetValue
 			lock (s_lock)
 				query.TimesCancelled++;
 			throw;
+		}
+		finally
+		{
+			_ = query.WaitForTestToFinalize.TrySetResult();
 		}
 	}
 }

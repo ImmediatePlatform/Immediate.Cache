@@ -133,27 +133,42 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 		[SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "Double-checked lock pattern")]
 		private Task<TResponse> GetHandlerTask()
 		{
-			if (_responseSource is not null)
+			if (_responseSource is { Task.Status: not (TaskStatus.Faulted or TaskStatus.Canceled) })
 				return _responseSource.Task;
 
 			lock (_lock)
 			{
-				if (_responseSource is not null)
+				if (_responseSource is { Task.Status: not (TaskStatus.Faulted or TaskStatus.Canceled) })
 					return _responseSource.Task;
 
-				var ts = _tokenSource = new();
-				_responseSource = new();
+				// escape current sync context
+				_ = Task.Factory.StartNew(
+					RunHandler,
+					CancellationToken.None,
+					TaskCreationOptions.PreferFairness,
+					TaskScheduler.Current
+				);
 
-				return Task.Run(() => RunHandler(ts));
+				return (_responseSource = new()).Task;
 			}
 		}
 
-		private async Task<TResponse> RunHandler(CancellationTokenSource tokenSource)
+		private async Task RunHandler()
 		{
 			while (true)
 			{
-				if (_responseSource?.Task is { IsCompletedSuccessfully: true } task)
-					return await task.ConfigureAwait(false);
+				CancellationTokenSource tokenSource;
+
+				lock (_lock)
+				{
+					if (_responseSource?.Task is { IsCompletedSuccessfully: true })
+						return;
+
+					if (_tokenSource is null or { IsCancellationRequested: true })
+						_tokenSource = new();
+
+					tokenSource = _tokenSource;
+				}
 
 				try
 				{
@@ -171,26 +186,25 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 
 						lock (_lock)
 						{
-							if (!token.IsCancellationRequested)
-							{
-								var rs = _responseSource ??= new();
-								rs.SetResult(response);
-
-								return response;
-							}
+							if (!tokenSource.IsCancellationRequested)
+								_responseSource!.SetResult(response);
 						}
 					}
 				}
 				catch (OperationCanceledException) when (tokenSource.IsCancellationRequested)
 				{
 				}
-
-				lock (_lock)
+#pragma warning disable CA1031 // Do not catch general exception types
+				// no one is listening to `RunHandler`; return the exception via `SetException`
+				catch (Exception ex)
+#pragma warning restore CA1031
 				{
-					if (_tokenSource is null or { IsCancellationRequested: true })
-						_tokenSource = new();
-
-					tokenSource = _tokenSource;
+					lock (_lock)
+					{
+						if (!tokenSource.IsCancellationRequested)
+							_responseSource?.SetException(ex);
+						return;
+					}
 				}
 			}
 		}
@@ -199,8 +213,11 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 		{
 			lock (_lock)
 			{
-				_responseSource = new TaskCompletionSource<TResponse>();
+				if (_responseSource is null or { Task.IsCompleted: true })
+					_responseSource = new TaskCompletionSource<TResponse>();
+
 				_responseSource.SetResult(response);
+
 				_tokenSource?.Cancel();
 				_tokenSource = null;
 			}
@@ -210,7 +227,9 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 		{
 			lock (_lock)
 			{
-				_responseSource = null;
+				if (_responseSource is { Task.IsCompleted: true })
+					_responseSource = null;
+
 				_tokenSource?.Cancel();
 				_tokenSource = null;
 			}
