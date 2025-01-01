@@ -290,4 +290,21 @@ public sealed class ApplicationCacheTests
 		Assert.Equal(0, request.TimesExecuted);
 		Assert.Equal(1, request.TimesCancelled);
 	}
+
+	[Test]
+	public async Task ExceptionGetsPropagatedCorrectly()
+	{
+		var request = new DelayGetValue.Query()
+		{
+			Value = 1,
+			Name = "Request1",
+			ThrowException = true,
+		};
+
+		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
+		var responseTask = cache.GetValue(request, default);
+
+		var ex = await Assert.ThrowsAsync<InvalidOperationException>(async () => await responseTask);
+		Assert.Equal("Test Exception 1", ex.Message);
+	}
 }

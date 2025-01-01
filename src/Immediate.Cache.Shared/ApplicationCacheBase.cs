@@ -187,14 +187,23 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 						lock (_lock)
 						{
 							if (!tokenSource.IsCancellationRequested)
-							{
 								_responseSource!.SetResult(response);
-							}
 						}
 					}
 				}
 				catch (OperationCanceledException) when (tokenSource.IsCancellationRequested)
 				{
+				}
+#pragma warning disable CA1031 // Do not catch general exception types
+				// no one is listening to `RunHandler`; return the exception via `SetException`
+				catch (Exception ex)
+#pragma warning restore CA1031
+				{
+					lock (_lock)
+					{
+						if (!tokenSource.IsCancellationRequested)
+							_responseSource?.SetException(ex);
+					}
 				}
 			}
 		}

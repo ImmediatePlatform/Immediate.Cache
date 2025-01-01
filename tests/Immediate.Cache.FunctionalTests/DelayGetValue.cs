@@ -12,6 +12,7 @@ public static partial class DelayGetValue
 		public int TimesExecuted { get; set; }
 		public int TimesCancelled { get; set; }
 		public CancellationToken CancellationToken { get; set; }
+		public bool ThrowException { get; init; }
 
 		public TaskCompletionSource WaitForTestToContinueOperation { get; } = new();
 		public TaskCompletionSource WaitForTestToStartExecuting { get; } = new();
@@ -27,6 +28,9 @@ public static partial class DelayGetValue
 		CancellationToken token
 	)
 	{
+		if (query.ThrowException)
+			throw new InvalidOperationException($"Test Exception {query.Value}");
+
 		try
 		{
 			query.CancellationToken = token;
