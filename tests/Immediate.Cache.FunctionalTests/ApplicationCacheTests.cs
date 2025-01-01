@@ -80,14 +80,12 @@ public sealed class ApplicationCacheTests
 		{
 			Value = 1,
 			Name = "Request1",
-			CompletionSource = new(),
 		};
 
 		var request2 = new DelayGetValue.Query()
 		{
 			Value = 1,
 			Name = "Request2",
-			CompletionSource = new(),
 		};
 
 		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
@@ -102,7 +100,7 @@ public sealed class ApplicationCacheTests
 		Assert.Equal(0, request2.TimesExecuted);
 
 		// request2 does nothing at this point
-		request2.CompletionSource.SetResult();
+		request2.WaitForTestToContinueOperation.SetResult();
 
 		Assert.False(response1Task.IsCompleted);
 		Assert.False(response2Task.IsCompleted);
@@ -111,7 +109,7 @@ public sealed class ApplicationCacheTests
 		Assert.Equal(0, request2.TimesExecuted);
 
 		// trigger request1, which should run exactly once
-		request1.CompletionSource.SetResult();
+		request1.WaitForTestToContinueOperation.SetResult();
 
 		var response1 = await response1Task;
 		var response2 = await response2Task;
@@ -130,7 +128,6 @@ public sealed class ApplicationCacheTests
 		{
 			Value = 1,
 			Name = "Request1",
-			CompletionSource = new(),
 		};
 
 		using var tcs = new CancellationTokenSource();
@@ -144,14 +141,13 @@ public sealed class ApplicationCacheTests
 		Assert.False(request.CancellationToken.IsCancellationRequested);
 
 		// actual handler will continue executing in spite of no remaining callers
-		request.CompletionSource.SetResult();
+		request.WaitForTestToContinueOperation.SetResult();
 
 		// check that value is now properly in cache
 		var request2 = new DelayGetValue.Query()
 		{
 			Value = 1,
 			Name = "Request2",
-			CompletionSource = new(),
 		};
 
 		var response = await cache.GetValue(request2);
@@ -168,7 +164,6 @@ public sealed class ApplicationCacheTests
 		{
 			Value = 1,
 			Name = "Request1",
-			CompletionSource = new(),
 		};
 
 		using var cts2 = new CancellationTokenSource();
@@ -176,7 +171,6 @@ public sealed class ApplicationCacheTests
 		{
 			Value = 1,
 			Name = "Request2",
-			CompletionSource = new(),
 		};
 
 		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
@@ -210,7 +204,6 @@ public sealed class ApplicationCacheTests
 		{
 			Value = 1,
 			Name = "Request1",
-			CompletionSource = new(),
 		};
 
 		using var cts2 = new CancellationTokenSource();
@@ -218,7 +211,6 @@ public sealed class ApplicationCacheTests
 		{
 			Value = 1,
 			Name = "Request2",
-			CompletionSource = new(),
 		};
 
 		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
@@ -251,18 +243,18 @@ public sealed class ApplicationCacheTests
 		{
 			Value = 1,
 			Name = "Request1",
-			CompletionSource = new(),
 		};
 
 		using var tcs = new CancellationTokenSource();
 		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
 		var responseTask = cache.GetValue(request, tcs.Token);
 
-		// allow IC task to be run
-		await Task.Delay(10);
+		await request.WaitForTestToStartExecuting.Task;
 
 		cache.RemoveValue(request);
-		request.CompletionSource.SetResult();
+		await request.WaitForTestToFinalize.Task;
+
+		request.WaitForTestToContinueOperation.SetResult();
 
 		var response = await responseTask;
 
@@ -280,20 +272,20 @@ public sealed class ApplicationCacheTests
 		{
 			Value = 1,
 			Name = "Request1",
-			CompletionSource = new(),
 		};
 
 		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
 		var responseTask = cache.GetValue(request, default);
 
-		// allow IC task to be run
-		await Task.Delay(10);
+		await request.WaitForTestToStartExecuting.Task;
 
 		cache.SetValue(request, new(5, ExecutedHandler: false, Guid.NewGuid()));
 
 		var response = await responseTask;
 		Assert.Equal(5, response.Value);
 		Assert.False(response.ExecutedHandler);
+
+		await request.WaitForTestToFinalize.Task;
 
 		Assert.Equal(0, request.TimesExecuted);
 		Assert.Equal(1, request.TimesCancelled);
