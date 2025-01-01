@@ -203,6 +203,7 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 					{
 						if (!tokenSource.IsCancellationRequested)
 							_responseSource?.SetException(ex);
+						return;
 					}
 				}
 			}
