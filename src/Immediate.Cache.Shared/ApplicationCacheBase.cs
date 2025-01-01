@@ -130,16 +130,12 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 		public async ValueTask<TResponse> GetValue(CancellationToken cancellationToken) =>
 			await GetHandlerTask().WaitAsync(cancellationToken).ConfigureAwait(false);
 
-		[SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", Justification = "Double-checked lock pattern")]
 		private Task<TResponse> GetHandlerTask()
 		{
-			if (_responseSource is { Task.Status: not (TaskStatus.Faulted or TaskStatus.Canceled) })
-				return _responseSource.Task;
-
 			lock (_lock)
 			{
-				if (_responseSource is { Task.Status: not (TaskStatus.Faulted or TaskStatus.Canceled) })
-					return _responseSource.Task;
+				if (_responseSource is { Task: { Status: not (TaskStatus.Faulted or TaskStatus.Canceled) } task })
+					return task;
 
 				// escape current sync context
 				_ = Task.Factory.StartNew(
