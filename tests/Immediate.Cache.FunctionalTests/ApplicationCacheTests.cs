@@ -258,11 +258,10 @@ public sealed class ApplicationCacheTests
 		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
 		var responseTask = cache.GetValue(request, tcs.Token);
 
-		cache.RemoveValue(request);
-
 		// allow IC task to be run
 		await Task.Delay(10);
 
+		cache.RemoveValue(request);
 		request.CompletionSource.SetResult();
 
 		var response = await responseTask;
