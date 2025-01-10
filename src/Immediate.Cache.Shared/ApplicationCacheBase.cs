@@ -137,35 +137,32 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 				if (_responseSource is { Task: { Status: not (TaskStatus.Faulted or TaskStatus.Canceled) } task })
 					return task;
 
+				task = (_responseSource = new()).Task;
+				var cancellationTokenSource = _tokenSource = new();
+
 				// escape current sync context
 				_ = Task.Factory.StartNew(
-					RunHandler,
+					o => RunHandler((CancellationTokenSource)o!),
+					cancellationTokenSource,
 					CancellationToken.None,
 					TaskCreationOptions.PreferFairness,
 					TaskScheduler.Current
 				);
 
-				return (_responseSource = new()).Task;
+				return task;
 			}
 		}
 
-		private async Task RunHandler()
+		private async Task RunHandler(CancellationTokenSource tokenSource)
 		{
+			lock (_lock)
+			{
+				if (_responseSource?.Task is { IsCompletedSuccessfully: true })
+					return;
+			}
+
 			while (true)
 			{
-				CancellationTokenSource tokenSource;
-
-				lock (_lock)
-				{
-					if (_responseSource?.Task is { IsCompletedSuccessfully: true })
-						return;
-
-					if (_tokenSource is null or { IsCancellationRequested: true })
-						_tokenSource = new();
-
-					tokenSource = _tokenSource;
-				}
-
 				try
 				{
 					var token = tokenSource.Token;
@@ -201,6 +198,17 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 							_responseSource?.SetException(ex);
 						return;
 					}
+				}
+
+				lock (_lock)
+				{
+					if (_responseSource is null or { Task.IsCompleted: true })
+						return;
+
+					if (_tokenSource is null or { IsCancellationRequested: true })
+						_tokenSource = new();
+
+					tokenSource = _tokenSource;
 				}
 			}
 		}
