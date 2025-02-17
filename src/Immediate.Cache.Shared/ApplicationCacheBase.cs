@@ -117,6 +117,35 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 	public void RemoveValue(TRequest request) =>
 		GetCacheValue(request).RemoveValue();
 
+	/// <summary>
+	///	    Transforms the cached value, returning the newly transformed value.
+	/// </summary>
+	/// <param name="request">
+	///	    The request payload to be cached.
+	/// </param>
+	/// <param name="transformer">
+	///	    A method which will transformed the cached value into a new value.
+	/// </param>
+	/// <param name="token">
+	///	    The <see cref="CancellationToken"/> to monitor for a cancellation request.
+	/// </param>
+	/// <returns>
+	///	    The transformed value.
+	/// </returns>
+	/// <remarks>
+	///	    The <paramref name="transformer"/> method may be called multiple times. <see cref="TransformValue(TRequest,
+	///     Func{TResponse, CancellationToken, ValueTask{TResponse}}, CancellationToken)"/> is implemented by retrieving
+	///     the value from cache, modifying it, and attempting to store the new value into the cache. Since the update
+	///     cannot be done inside of a critical section, the cached value may have changed between query and storage. If
+	///     this happens, the transformation process will be restarted.
+	/// </remarks>
+	protected ValueTask<TResponse> TransformValue(
+		TRequest request,
+		Func<TResponse, CancellationToken, ValueTask<TResponse>> transformer,
+		CancellationToken token = default
+	) =>
+		GetCacheValue(request).Transform(transformer, token);
+
 	[SuppressMessage("Design", "CA1001:Types that own disposable fields should be disposable", Justification = "CancellationTokenSource does not need to be disposed here.")]
 	private sealed class CacheValue(
 		TRequest request,
@@ -218,12 +247,64 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 			lock (_lock)
 			{
 				if (_responseSource is null or { Task.IsCompleted: true })
-					_responseSource = new TaskCompletionSource<TResponse>();
+					_responseSource = new();
 
 				_responseSource.SetResult(response);
 
 				_tokenSource?.Cancel();
 				_tokenSource = null;
+			}
+		}
+
+		[SuppressMessage("Performance", "CA1849:Call async methods when in an async method", Justification = "Inside a `lock`, and testing `IsCompleted` first.")]
+		public async ValueTask<TResponse> Transform(
+			Func<TResponse, CancellationToken, ValueTask<TResponse>> transformer,
+			CancellationToken token
+		)
+		{
+			while (true)
+			{
+				if (await Core(transformer, token).ConfigureAwait(false) is (true, var response))
+					return response;
+
+				_ = await GetHandlerTask().WaitAsync(token).ConfigureAwait(false);
+			}
+
+			async ValueTask<(bool, TResponse)> Core(
+				Func<TResponse, CancellationToken, ValueTask<TResponse>> transformer,
+				CancellationToken token
+			)
+			{
+				if (GetTask() is not { } task)
+					return default;
+
+				var response = await task.ConfigureAwait(false);
+				var result = await transformer(response, token).ConfigureAwait(false);
+
+				lock (_lock)
+				{
+					if (!ReferenceEquals(_responseSource?.Task, task))
+						return default;
+
+					(_responseSource = new()).SetResult(result);
+					return (true, result);
+				}
+			}
+
+			[SuppressMessage(
+				"Design",
+				"MA0022:Return Task.FromResult instead of returning null",
+				Justification = "`null` is actually desired here"
+			)]
+			Task<TResponse>? GetTask()
+			{
+				lock (_lock)
+				{
+					if (_responseSource is { Task: { IsCompleted: true } task })
+						return task;
+				}
+
+				return null;
 			}
 		}
 
