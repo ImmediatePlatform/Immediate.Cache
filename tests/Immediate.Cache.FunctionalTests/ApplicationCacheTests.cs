@@ -307,4 +307,120 @@ public sealed class ApplicationCacheTests
 		var ex = await Assert.ThrowsAsync<InvalidOperationException>(async () => await responseTask);
 		Assert.Equal("Test Exception 1", ex.Message);
 	}
+
+	[Test]
+	public async Task TransformWorksWhenNoValueCachedInitially()
+	{
+		var request = new DelayGetValue.Query()
+		{
+			Value = 1,
+			Name = "Request1",
+		};
+		request.WaitForTestToContinueOperation.SetResult();
+
+		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
+
+		var transformation = new DelayGetValueCache.TransformParameters { Adder = 5 };
+		transformation.WaitForTestToContinueOperation.SetResult();
+		var transformedResponse = await cache.TransformResult(request, transformation);
+
+		Assert.Equal(6, transformedResponse.Value);
+		Assert.Equal(1, transformation.TimesExecuted);
+
+		var cachedResponse = await cache.GetValue(request);
+		Assert.Equal(6, cachedResponse.Value);
+
+		Assert.True(cachedResponse.RandomValue == transformedResponse.RandomValue);
+	}
+
+	[Test]
+	public async Task TransformWorksWhenValueCachedInitially()
+	{
+		var request = new DelayGetValue.Query()
+		{
+			Value = 1,
+			Name = "Request1",
+		};
+		request.WaitForTestToContinueOperation.SetResult();
+
+		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
+
+		var cachedResponse = await cache.GetValue(request);
+		Assert.Equal(1, cachedResponse.Value);
+
+		var transformation = new DelayGetValueCache.TransformParameters { Adder = 5 };
+		transformation.WaitForTestToContinueOperation.SetResult();
+		var transformedResponse = await cache.TransformResult(request, transformation);
+
+		Assert.Equal(6, transformedResponse.Value);
+		Assert.Equal(1, transformation.TimesExecuted);
+
+		cachedResponse = await cache.GetValue(request);
+		Assert.Equal(6, cachedResponse.Value);
+
+		Assert.True(cachedResponse.RandomValue == transformedResponse.RandomValue);
+	}
+
+	[Test]
+	public async Task TransformWorksWhenValueChanges()
+	{
+		var request = new DelayGetValue.Query()
+		{
+			Value = 1,
+			Name = "Request1",
+		};
+		request.WaitForTestToContinueOperation.SetResult();
+
+		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
+
+		var cachedResponse = await cache.GetValue(request);
+		Assert.Equal(1, cachedResponse.Value);
+
+		var transformation = new DelayGetValueCache.TransformParameters { Adder = 5 };
+		var transformedResponseTask = cache.TransformResult(request, transformation);
+		await transformation.WaitForTestToStartExecuting.Task;
+
+		cache.SetValue(request, new(4, ExecutedHandler: false, Guid.NewGuid()));
+		transformation.WaitForTestToContinueOperation.SetResult();
+
+		var transformedResponse = await transformedResponseTask;
+		Assert.Equal(9, transformedResponse.Value);
+		Assert.Equal(2, transformation.TimesExecuted);
+
+		cachedResponse = await cache.GetValue(request);
+		Assert.Equal(9, cachedResponse.Value);
+
+		Assert.True(cachedResponse.RandomValue == transformedResponse.RandomValue);
+	}
+
+	[Test]
+	public async Task TransformWorksWhenMultipleSimultaneous()
+	{
+		var request = new DelayGetValue.Query()
+		{
+			Value = 1,
+			Name = "Request1",
+		};
+		request.WaitForTestToContinueOperation.SetResult();
+
+		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
+
+		var transformation1 = new DelayGetValueCache.TransformParameters { Adder = 5 };
+		var transformedResponseTask1 = cache.TransformResult(request, transformation1);
+		await transformation1.WaitForTestToStartExecuting.Task;
+
+		var transformation2 = new DelayGetValueCache.TransformParameters { Adder = 6 };
+		var transformedResponseTask2 = cache.TransformResult(request, transformation2);
+		await transformation2.WaitForTestToStartExecuting.Task;
+
+		transformation1.WaitForTestToContinueOperation.SetResult();
+		var transformedResponse1 = await transformedResponseTask1;
+		Assert.Equal(6, transformedResponse1.Value);
+		Assert.Equal(1, transformation1.TimesExecuted);
+
+		transformation2.WaitForTestToContinueOperation.SetResult();
+		var transformedResponse2 = await transformedResponseTask2;
+		Assert.Equal(12, transformedResponse2.Value);
+		Assert.Equal(2, transformation2.TimesExecuted);
+	}
 }
