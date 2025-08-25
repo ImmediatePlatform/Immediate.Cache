@@ -8,7 +8,7 @@
 	<PackageVersion Include="coverlet.msbuild" Version="6.0.4" />
 	<PackageVersion Include="DotNet.ReproducibleBuilds" Version="1.2.25" />
 	<PackageVersion Include="GitHubActionsTestLogger" Version="2.4.1" />
-	<PackageVersion Include="Immediate.Handlers" Version="2.1.0" />
+	<PackageVersion Include="Immediate.Handlers" Version="3.0.0" />
 	<PackageVersion Include="MinVer" Version="6.0.0" />
 	<PackageVersion Include="TUnit.Engine" Version="0.19.86" />
 	<PackageVersion Include="xunit.v3.assert" Version="2.0.1" />
