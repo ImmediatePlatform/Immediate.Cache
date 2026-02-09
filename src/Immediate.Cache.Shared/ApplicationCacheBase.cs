@@ -195,11 +195,11 @@ public abstract class ApplicationCacheBase<TRequest, TResponse>(
 				try
 				{
 					var token = tokenSource.Token;
-					var scope = handler.GetScope();
+					var scope = handler.GetScope(out var service);
 
 					await using (scope.ConfigureAwait(false))
 					{
-						var response = await scope.Service
+						var response = await service
 							.HandleAsync(
 								request,
 								token
