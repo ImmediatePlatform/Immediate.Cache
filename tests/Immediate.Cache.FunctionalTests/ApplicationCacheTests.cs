@@ -150,7 +150,7 @@ public sealed class ApplicationCacheTests
 			Name = "Request2",
 		};
 
-		var response = await cache.GetValue(request2, TestContext.Current.CancellationToken);
+		_ = await cache.GetValue(request2, TestContext.Current.CancellationToken);
 
 		Assert.Equal(1, request.TimesExecuted);
 		Assert.Equal(0, request2.TimesExecuted);
