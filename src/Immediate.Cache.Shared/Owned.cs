@@ -37,7 +37,15 @@ public sealed class Owned<T>(
 	public OwnedScope<T> GetScope(out T service)
 	{
 		var scope = serviceScopeFactory.CreateAsyncScope();
-		service = scope.ServiceProvider.GetRequiredService<T>();
-		return new(service, scope);
+		try
+		{
+			service = scope.ServiceProvider.GetRequiredService<T>();
+			return new(service, scope);
+		}
+		catch
+		{
+			scope.Dispose();
+			throw;
+		}
 	}
 }
