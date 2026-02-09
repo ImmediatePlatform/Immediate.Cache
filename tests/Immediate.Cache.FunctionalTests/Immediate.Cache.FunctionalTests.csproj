@@ -1,27 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	<TargetFrameworks>net8.0;net9.0</TargetFrameworks>
+	<OutputType>Exe</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
 	<PackageReference Include="coverlet.collector" PrivateAssets="All" />
 	<PackageReference Include="coverlet.msbuild" PrivateAssets="All" />
-	<PackageReference Include="GitHubActionsTestLogger" PrivateAssets="All" />
 	<PackageReference Include="Microsoft.Extensions.Caching.Memory" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
-	<PackageReference Include="TUnit.Engine" />
-    <PackageReference Include="xunit.v3.assert" />
+	<PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+	<PackageReference Include="xunit.v3.mtp-v2" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Immediate.Cache.Shared\Immediate.Cache.Shared.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-	<Using Condition="!$([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', 'net9.0'))"
-		   Alias="Lock"
-		   Include="System.Object" />
+	<ProjectReference Include="..\..\src\Immediate.Cache.Shared\Immediate.Cache.Shared.csproj" />
   </ItemGroup>
 
 </Project>

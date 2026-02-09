@@ -20,12 +20,12 @@ public sealed class ApplicationCacheTests
 		_serviceProvider = services.BuildServiceProvider();
 	}
 
-	[Test]
+	[Fact]
 	public async Task GetValueCachesValue()
 	{
 		var request = new GetValue.Query(Value: 1);
 		var cache = _serviceProvider.GetRequiredService<GetValueCache>();
-		var response = await cache.GetValue(request);
+		var response = await cache.GetValue(request, TestContext.Current.CancellationToken);
 
 		Assert.Equal(1, response.Value);
 		Assert.True(response.ExecutedHandler);
@@ -34,7 +34,7 @@ public sealed class ApplicationCacheTests
 		Assert.True(memoryCache.TryGetValue($"GetValue(query: {request.Value})", out var _));
 	}
 
-	[Test]
+	[Fact]
 	public async Task SetValueCachesValue()
 	{
 		var request = new GetValue.Query(Value: 2);
@@ -44,13 +44,13 @@ public sealed class ApplicationCacheTests
 		var memoryCache = _serviceProvider.GetRequiredService<IMemoryCache>();
 		Assert.True(memoryCache.TryGetValue($"GetValue(query: {request.Value})", out var _));
 
-		var response = await cache.GetValue(request);
+		var response = await cache.GetValue(request, TestContext.Current.CancellationToken);
 
 		Assert.Equal(4, response.Value);
 		Assert.False(response.ExecutedHandler);
 	}
 
-	[Test]
+	[Fact]
 	public async Task RemoveValueRemovesValue()
 	{
 		var request = new GetValue.Query(Value: 3);
@@ -60,20 +60,20 @@ public sealed class ApplicationCacheTests
 		var memoryCache = _serviceProvider.GetRequiredService<IMemoryCache>();
 		Assert.True(memoryCache.TryGetValue($"GetValue(query: {request.Value})", out var _));
 
-		var response = await cache.GetValue(request);
+		var response = await cache.GetValue(request, TestContext.Current.CancellationToken);
 
 		Assert.Equal(4, response.Value);
 		Assert.False(response.ExecutedHandler);
 
 		cache.RemoveValue(request);
 
-		response = await cache.GetValue(request);
+		response = await cache.GetValue(request, TestContext.Current.CancellationToken);
 
 		Assert.Equal(3, response.Value);
 		Assert.True(response.ExecutedHandler);
 	}
 
-	[Test]
+	[Fact]
 	public async Task SimultaneousAccessIsSerialized()
 	{
 		var request1 = new DelayGetValue.Query()
@@ -89,8 +89,8 @@ public sealed class ApplicationCacheTests
 		};
 
 		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
-		var response1Task = cache.GetValue(request1);
-		var response2Task = cache.GetValue(request2);
+		var response1Task = cache.GetValue(request1, TestContext.Current.CancellationToken);
+		var response2Task = cache.GetValue(request2, TestContext.Current.CancellationToken);
 
 		// both waiting until tcs triggered
 		Assert.False(response1Task.IsCompleted);
@@ -121,7 +121,7 @@ public sealed class ApplicationCacheTests
 		Assert.Equal(response1.RandomValue, response2.RandomValue);
 	}
 
-	[Test]
+	[Fact]
 	public async Task ProperlyUsesCancellationToken()
 	{
 		var request = new DelayGetValue.Query()
@@ -150,13 +150,13 @@ public sealed class ApplicationCacheTests
 			Name = "Request2",
 		};
 
-		var response = await cache.GetValue(request2);
+		var response = await cache.GetValue(request2, TestContext.Current.CancellationToken);
 
 		Assert.Equal(1, request.TimesExecuted);
 		Assert.Equal(0, request2.TimesExecuted);
 	}
 
-	[Test]
+	[Fact]
 	public async Task CancellingFirstAccessOperatesCorrectly()
 	{
 		using var cts1 = new CancellationTokenSource();
@@ -196,7 +196,7 @@ public sealed class ApplicationCacheTests
 		Assert.True(response2Task.IsCanceled);
 	}
 
-	[Test]
+	[Fact]
 	public async Task CancellingSecondAccessOperatesCorrectly()
 	{
 		using var cts1 = new CancellationTokenSource();
@@ -236,7 +236,7 @@ public sealed class ApplicationCacheTests
 		Assert.True(response2Task.IsCanceled);
 	}
 
-	[Test]
+	[Fact]
 	public async Task RemovingValueCancelsExistingOperation()
 	{
 		var request = new DelayGetValue.Query()
@@ -265,7 +265,7 @@ public sealed class ApplicationCacheTests
 		Assert.True(response.ExecutedHandler);
 	}
 
-	[Test]
+	[Fact]
 	public async Task SettingValueCancelsExistingOperation()
 	{
 		var request = new DelayGetValue.Query()
@@ -275,7 +275,7 @@ public sealed class ApplicationCacheTests
 		};
 
 		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
-		var responseTask = cache.GetValue(request, default);
+		var responseTask = cache.GetValue(request, TestContext.Current.CancellationToken);
 
 		await request.WaitForTestToStartExecuting.Task;
 
@@ -291,7 +291,7 @@ public sealed class ApplicationCacheTests
 		Assert.Equal(1, request.TimesCancelled);
 	}
 
-	[Test]
+	[Fact]
 	public async Task ExceptionGetsPropagatedCorrectly()
 	{
 		var request = new DelayGetValue.Query()
@@ -302,13 +302,13 @@ public sealed class ApplicationCacheTests
 		};
 
 		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
-		var responseTask = cache.GetValue(request, default);
+		var responseTask = cache.GetValue(request, TestContext.Current.CancellationToken);
 
 		var ex = await Assert.ThrowsAsync<InvalidOperationException>(async () => await responseTask);
 		Assert.Equal("Test Exception 1", ex.Message);
 	}
 
-	[Test]
+	[Fact]
 	public async Task TransformWorksWhenNoValueCachedInitially()
 	{
 		var request = new DelayGetValue.Query()
@@ -327,13 +327,13 @@ public sealed class ApplicationCacheTests
 		Assert.Equal(6, transformedResponse.Value);
 		Assert.Equal(1, transformation.TimesExecuted);
 
-		var cachedResponse = await cache.GetValue(request);
+		var cachedResponse = await cache.GetValue(request, TestContext.Current.CancellationToken);
 		Assert.Equal(6, cachedResponse.Value);
 
 		Assert.True(cachedResponse.RandomValue == transformedResponse.RandomValue);
 	}
 
-	[Test]
+	[Fact]
 	public async Task TransformWorksWhenValueCachedInitially()
 	{
 		var request = new DelayGetValue.Query()
@@ -345,7 +345,7 @@ public sealed class ApplicationCacheTests
 
 		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
 
-		var cachedResponse = await cache.GetValue(request);
+		var cachedResponse = await cache.GetValue(request, TestContext.Current.CancellationToken);
 		Assert.Equal(1, cachedResponse.Value);
 
 		var transformation = new DelayGetValueCache.TransformParameters { Adder = 5 };
@@ -355,13 +355,13 @@ public sealed class ApplicationCacheTests
 		Assert.Equal(6, transformedResponse.Value);
 		Assert.Equal(1, transformation.TimesExecuted);
 
-		cachedResponse = await cache.GetValue(request);
+		cachedResponse = await cache.GetValue(request, TestContext.Current.CancellationToken);
 		Assert.Equal(6, cachedResponse.Value);
 
 		Assert.True(cachedResponse.RandomValue == transformedResponse.RandomValue);
 	}
 
-	[Test]
+	[Fact]
 	public async Task TransformWorksWhenValueChanges()
 	{
 		var request = new DelayGetValue.Query()
@@ -373,7 +373,7 @@ public sealed class ApplicationCacheTests
 
 		var cache = _serviceProvider.GetRequiredService<DelayGetValueCache>();
 
-		var cachedResponse = await cache.GetValue(request);
+		var cachedResponse = await cache.GetValue(request, TestContext.Current.CancellationToken);
 		Assert.Equal(1, cachedResponse.Value);
 
 		var transformation = new DelayGetValueCache.TransformParameters { Adder = 5 };
@@ -387,13 +387,13 @@ public sealed class ApplicationCacheTests
 		Assert.Equal(9, transformedResponse.Value);
 		Assert.Equal(2, transformation.TimesExecuted);
 
-		cachedResponse = await cache.GetValue(request);
+		cachedResponse = await cache.GetValue(request, TestContext.Current.CancellationToken);
 		Assert.Equal(9, cachedResponse.Value);
 
 		Assert.True(cachedResponse.RandomValue == transformedResponse.RandomValue);
 	}
 
-	[Test]
+	[Fact]
 	public async Task TransformWorksWhenMultipleSimultaneous()
 	{
 		var request = new DelayGetValue.Query()
