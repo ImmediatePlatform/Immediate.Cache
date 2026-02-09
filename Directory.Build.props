@@ -16,6 +16,13 @@
 	<IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup Label="Enabled Polyfills">
+	<!--https://github.com/meziantou/Meziantou.Polyfill?tab=readme-ov-file#supported-polyfills-->
+	<Polyfill></Polyfill>
+	<Polyfill>$(Polyfill)|T:System.Threading.Lock</Polyfill>
+	<MeziantouPolyfill_IncludedPolyfills>$(Polyfill)</MeziantouPolyfill_IncludedPolyfills>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
 	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 	<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
