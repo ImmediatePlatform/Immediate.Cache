@@ -308,7 +308,7 @@ dotnet_diagnostic.MA0048.severity = none
 dotnet_diagnostic.MA0051.severity = none
 dotnet_diagnostic.MA0053.severity = warning
 
-[src/Immdiate.Cache.Shared/**.cs]
+[src/Immediate.Cache.Shared/**.cs]
 
 # XML Documentation
 dotnet_diagnostic.CS1573.severity = error               # CS1573: Missing XML comment for parameter

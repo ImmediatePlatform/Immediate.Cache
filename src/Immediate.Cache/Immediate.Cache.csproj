@@ -35,7 +35,7 @@
 
   <ItemGroup>
 	<None Include="../../readme.md" Pack="true" PackagePath="/" />
-	<None Include="../Immediate.Cache.Analyzers/bin/$(Configuration)/netstandard2.0/Immediate.Cache.Analyzers.dll" Pack="true" PackagePath="analyzers/roslyn4.8/dotnet/cs" Visible="true" />
+	<None Include="../Immediate.Cache.Analyzers/bin/$(Configuration)/netstandard2.0/Immediate.Cache.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.8/cs" Visible="true" />
 
 	<TfmSpecificPackageFile
 	  Include="../Immediate.Cache.Shared/bin/$(Configuration)/$(TargetFramework)/Immediate.Cache.Shared.dll"

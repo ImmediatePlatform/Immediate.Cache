@@ -47,14 +47,8 @@ public sealed class OwnedDisposableScopeSuppressor : DiagnosticSuppressor
 				continue;
 			}
 
-			var symbol = context.GetSemanticModel(syntaxTree).GetSymbolInfo(expression, token).Symbol switch
-			{
-				IParameterSymbol ps => ps.Type,
-				IPropertySymbol ps => ps.Type,
-				IFieldSymbol fs => fs.Type,
-				ILocalSymbol ls => ls.Type,
-				_ => null,
-			};
+			var typeInfo = context.GetSemanticModel(syntaxTree).GetTypeInfo(expression, token);
+			var symbol = typeInfo.Type ?? typeInfo.ConvertedType;
 
 			if (symbol is not INamedTypeSymbol
 				{
