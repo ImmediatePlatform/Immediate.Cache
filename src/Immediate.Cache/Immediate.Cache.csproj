@@ -10,7 +10,7 @@
 	<Description>A collection of classes that simplify caching responses from Immediate.Handlers handlers.</Description>
 
 	<Authors>Immediate.Cache Developers</Authors>
-	<Copyright>© 2024 Immediate.Cache Developers</Copyright>
+	<Copyright>© 2024-2026 Immediate.Cache Developers</Copyright>
 
 	<PackageLicenseExpression>MIT</PackageLicenseExpression>
 	<PackageReadmeFile>readme.md</PackageReadmeFile>
@@ -29,11 +29,13 @@
   </ItemGroup>
 
   <ItemGroup>
+	<ProjectReference Include="../Immediate.Cache.Analyzers/Immediate.Cache.Analyzers.csproj" ReferenceOutputAssembly="false" />
 	<ProjectReference Include="../Immediate.Cache.Shared/Immediate.Cache.Shared.csproj" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
 	<None Include="../../readme.md" Pack="true" PackagePath="/" />
+	<None Include="../Immediate.Cache.Analyzers/bin/$(Configuration)/netstandard2.0/Immediate.Cache.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.8/cs" Visible="true" />
 
 	<TfmSpecificPackageFile
 	  Include="../Immediate.Cache.Shared/bin/$(Configuration)/$(TargetFramework)/Immediate.Cache.Shared.dll"
