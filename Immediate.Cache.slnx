@@ -13,10 +13,12 @@
     <File Path=".github/workflows/release.yml" />
   </Folder>
   <Folder Name="/Source/">
+    <Project Path="src/Immediate.Cache.Analyzers/Immediate.Cache.Analyzers.csproj" />
     <Project Path="src/Immediate.Cache.Shared/Immediate.Cache.Shared.csproj" />
     <Project Path="src/Immediate.Cache/Immediate.Cache.csproj" />
   </Folder>
   <Folder Name="/Tests/">
     <Project Path="tests/Immediate.Cache.FunctionalTests/Immediate.Cache.FunctionalTests.csproj" />
+    <Project Path="tests/Immediate.Cache.Tests/Immediate.Cache.Tests.csproj" />
   </Folder>
 </Solution>
