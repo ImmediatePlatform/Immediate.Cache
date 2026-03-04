@@ -88,27 +88,16 @@ public static class SuppressorTestHelpers
 		var test = new CSharpSuppressorTest<TSuppressor, DefaultVerifier>
 		{
 			TestCode = inputSource,
-			ReferenceAssemblies = new ReferenceAssemblies(
-				"net8.0",
-				new PackageIdentity(
-					"Microsoft.NETCore.App.Ref",
-					"8.0.0"),
-				Path.Combine("ref", "net8.0")
-			),
+			ReferenceAssemblies = Utility.ReferenceAssemblies,
 			CompilerDiagnostics = CompilerDiagnostics.Warnings,
 			DisabledDiagnostics =
 			{
 				"CS1591",
 				"CS8767",
 			},
-			TestState =
-			{
-				AdditionalReferences =
-				{
-					MetadataReference.CreateFromFile("./Immediate.Cache.Shared.dll"),
-				},
-			},
 		};
+
+		test.TestState.AdditionalReferences.AddRange(Utility.GetMetadataReferences());
 
 		return test;
 	}
