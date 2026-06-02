@@ -44,11 +44,11 @@ jobs:
       uses: coverallsapp/github-action@v2
       with:
         files: >
-          tests\Immediate.Cache.FunctionalTests\bin\Release\net8.0\TestResults\coverage.cobertura.xml
-          tests\Immediate.Cache.FunctionalTests\bin\Release\net9.0\TestResults\coverage.cobertura.xml
-          tests\Immediate.Cache.FunctionalTests\bin\Release\net10.0\TestResults\coverage.cobertura.xml
-          tests\Immediate.Cache.FunctionalTests\bin\Release\net11.0\TestResults\coverage.cobertura.xml
-          tests\Immediate.Cache.Tests\bin\Release\net8.0\TestResults\coverage.cobertura.xml
-          tests\Immediate.Cache.Tests\bin\Release\net9.0\TestResults\coverage.cobertura.xml
-          tests\Immediate.Cache.Tests\bin\Release\net10.0\TestResults\coverage.cobertura.xml
-          tests\Immediate.Cache.Tests\bin\Release\net11.0\TestResults\coverage.cobertura.xml
+          tests/Immediate.Cache.FunctionalTests/bin/Release/net8.0/TestResults/coverage.cobertura.xml
+          tests/Immediate.Cache.FunctionalTests/bin/Release/net9.0/TestResults/coverage.cobertura.xml
+          tests/Immediate.Cache.FunctionalTests/bin/Release/net10.0/TestResults/coverage.cobertura.xml
+          tests/Immediate.Cache.FunctionalTests/bin/Release/net11.0/TestResults/coverage.cobertura.xml
+          tests/Immediate.Cache.Tests/bin/Release/net8.0/TestResults/coverage.cobertura.xml
+          tests/Immediate.Cache.Tests/bin/Release/net9.0/TestResults/coverage.cobertura.xml
+          tests/Immediate.Cache.Tests/bin/Release/net10.0/TestResults/coverage.cobertura.xml
+          tests/Immediate.Cache.Tests/bin/Release/net11.0/TestResults/coverage.cobertura.xml
