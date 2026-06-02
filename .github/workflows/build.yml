@@ -40,7 +40,13 @@ jobs:
     - name: Test
       run: dotnet test -c Release --no-build -- --coverage --coverage-output-format cobertura --coverage-output coverage.cobertura.xml
 
+    - name: Find coverage files
+      uses: jeertmans/filesfinder@latest
+      id: ff
+      with:
+        args: "coverage.cobertura.xml"
+
     - name: Coveralls
       uses: coverallsapp/github-action@v2
       with:
-        files: ./**/coverage.cobertura.xml
+        files: ${{ steps.ff.outputs.files }}
