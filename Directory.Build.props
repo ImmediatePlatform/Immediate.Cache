@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
-	<TargetFrameworks>net8.0;net9.0;net10.0</TargetFrameworks>
-	<LangVersion>14</LangVersion>
+	<TargetFrameworks>net8.0;net9.0;net10.0;net11.0</TargetFrameworks>
+	<LangVersion>latest</LangVersion>
 
 	<Nullable>enable</Nullable>
 	<WarningsAsErrors>$(WarningsAsErrors);nullable;</WarningsAsErrors>
@@ -14,6 +14,9 @@
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
 
 	<IsPackable>false</IsPackable>
+	<WarnOnPackingNonPackableProject>false</WarnOnPackingNonPackableProject>
+
+	<EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
   <PropertyGroup Label="Enabled Polyfills">
@@ -23,11 +26,14 @@
 	<MeziantouPolyfill_IncludedPolyfills>$(Polyfill)</MeziantouPolyfill_IncludedPolyfills>
   </PropertyGroup>
 
+  <PropertyGroup Label="MinVer">
+	<MinVerAutoIncrement>minor</MinVerAutoIncrement>
+	<MinVerDefaultPreReleaseIdentifiers>preview</MinVerDefaultPreReleaseIdentifiers>
+	<MinVerTagPrefix>v</MinVerTagPrefix>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
 	<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 	<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
-	<EmbedUntrackedSources>true</EmbedUntrackedSources>
-	<CollectCoverage>true</CollectCoverage>
-	<CoverletOutputFormat>opencover</CoverletOutputFormat>
   </PropertyGroup>
 </Project>
