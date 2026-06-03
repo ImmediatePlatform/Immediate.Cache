@@ -46,7 +46,7 @@ jobs:
     - name: Package 
       run: dotnet pack -c Release --no-build --property:PackageOutputPath=../../nupkgs
     - name: Validate Package 
-      run: dotnet dotnet-validate package local ./nupkgs/*.nupkg
+      run: dotnet tool run dotnet-validate -- package local ./nupkgs/*.nupkg
 
     - name: Coveralls
       uses: coverallsapp/github-action@v2
