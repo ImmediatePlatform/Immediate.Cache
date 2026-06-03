@@ -14,12 +14,22 @@ internal static class Utility
 #elif NET10_0
 	public static ReferenceAssemblies ReferenceAssemblies => ReferenceAssemblies.Net.Net100;
 	public static IEnumerable<MetadataReference> NetCoreAssemblies => Basic.Reference.Assemblies.Net100.References.All;
+#elif NET11_0
+	public static ReferenceAssemblies ReferenceAssemblies { get; } = new ReferenceAssemblies(
+		"net11.0",
+		new PackageIdentity(
+			"Microsoft.NETCore.App.Ref",
+			"11.0.0-preview.4.26230.115"
+		),
+		Path.Combine("ref", "net11.0")
+	);
+	public static IEnumerable<MetadataReference> NetCoreAssemblies => Basic.Reference.Assemblies.Net110.References.All;
 #else
 #error .net version not yet implemented
 #endif
 
 	public static IEnumerable<MetadataReference> GetMetadataReferences() =>
 	[
-		MetadataReference.CreateFromFile("./Immediate.Cache.Shared.dll"),
+		MetadataReference.CreateFromFile(typeof(Owned<>).Assembly.Location),
 	];
 }

@@ -9,6 +9,7 @@
     <PackageReference Include="Immediate.Handlers" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+	<PackageReference Include="MinVer" PrivateAssets="all" />
   </ItemGroup>
 
 </Project>
