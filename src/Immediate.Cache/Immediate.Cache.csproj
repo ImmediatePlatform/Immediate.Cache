@@ -41,7 +41,7 @@
 	<TfmSpecificPackageFile
       Include="$(PkgScriban)/lib/netstandard2.0/Scriban.dll"
       Pack="true"
-      PackagePath="analyzers/roslyn4.8/dotnet/cs"
+      PackagePath="analyzers/dotnet/roslyn4.8/cs"
       Condition=" '$(TargetFramework)' == 'net8.0' " />
 
 	<TfmSpecificPackageFile
