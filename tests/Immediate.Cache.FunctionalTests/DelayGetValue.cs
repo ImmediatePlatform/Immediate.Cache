@@ -3,7 +3,7 @@ using Immediate.Handlers.Shared;
 namespace Immediate.Cache.FunctionalTests;
 
 [Handler]
-public static partial class DelayGetValue
+public sealed partial class DelayGetValue
 {
 	public sealed class Query
 	{
@@ -23,7 +23,7 @@ public static partial class DelayGetValue
 
 	private static readonly Lock Lock = new();
 
-	private static async ValueTask<Response> HandleAsync(
+	private async ValueTask<Response> HandleAsync(
 		Query query,
 		CancellationToken token
 	)
