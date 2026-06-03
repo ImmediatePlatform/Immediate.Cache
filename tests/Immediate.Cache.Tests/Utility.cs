@@ -1,9 +1,15 @@
+using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
+using Immediate.Cache.Shared;
+using Immediate.Handlers.Shared;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Testing;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Immediate.Cache.Tests;
 
-internal static class Utility
+internal static partial class Utility
 {
 #if NET8_0
 	public static ReferenceAssemblies ReferenceAssemblies => ReferenceAssemblies.Net.Net80;
@@ -28,8 +34,19 @@ internal static class Utility
 #error .net version not yet implemented
 #endif
 
-	public static IEnumerable<MetadataReference> GetMetadataReferences() =>
+	public static IEnumerable<MetadataReference> GetAdditionalReferences() =>
 	[
 		MetadataReference.CreateFromFile(typeof(Owned<>).Assembly.Location),
+		MetadataReference.CreateFromFile(typeof(HandlerAttribute).Assembly.Location),
+		MetadataReference.CreateFromFile(typeof(ServiceCollection).Assembly.Location),
+		MetadataReference.CreateFromFile(typeof(IServiceCollection).Assembly.Location),
+		MetadataReference.CreateFromFile(typeof(IMemoryCache).Assembly.Location),
 	];
+
+	public static SettingsTask VerifyIgnoreImmediateHandlers(GeneratorDriverRunResult result, [CallerFilePath] string sourceFile = "") =>
+		Verify(result, sourceFile: sourceFile)
+			.IgnoreGeneratedResult(gsr => ImmediateHandlersHintName().IsMatch(Path.GetFileName(gsr.HintName)));
+
+	[GeneratedRegex(@"IH\..*\.g\.cs", RegexOptions.ExplicitCapture, matchTimeoutMilliseconds: 100)]
+	private static partial Regex ImmediateHandlersHintName();
 }

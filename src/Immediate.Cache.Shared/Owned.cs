@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Immediate.Cache;
+namespace Immediate.Cache.Shared;
 
 /// <summary>
 ///		A factory for creating a scope containing a strong-type service as it's root.

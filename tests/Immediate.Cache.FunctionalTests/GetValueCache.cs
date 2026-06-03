@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Immediate.Cache.Shared;
 using Immediate.Handlers.Shared;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -7,7 +8,7 @@ namespace Immediate.Cache.FunctionalTests;
 public sealed class GetValueCache(
 	IMemoryCache memoryCache,
 	Owned<IHandler<GetValue.Query, GetValue.Response>> ownedHandler
-) : ApplicationCacheBase<GetValue.Query, GetValue.Response>(
+) : ApplicationCache<GetValue.Query, GetValue.Response>(
 	memoryCache,
 	ownedHandler
 )

@@ -1,4 +1,4 @@
-namespace Immediate.Cache;
+namespace Immediate.Cache.Shared;
 
 /// <summary>
 ///	    Represents a container for a scope and a scoped service that is rooted by the scope.

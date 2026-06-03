@@ -16,6 +16,7 @@
   </Folder>
   <Folder Name="/Source/">
     <Project Path="src/Immediate.Cache.Analyzers/Immediate.Cache.Analyzers.csproj" />
+    <Project Path="src/Immediate.Cache.Generators/Immediate.Cache.Generators.csproj" />
     <Project Path="src/Immediate.Cache.Shared/Immediate.Cache.Shared.csproj" />
     <Project Path="src/Immediate.Cache/Immediate.Cache.csproj" />
   </Folder>

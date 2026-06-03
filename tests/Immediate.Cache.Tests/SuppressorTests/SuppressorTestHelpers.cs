@@ -97,7 +97,7 @@ public static class SuppressorTestHelpers
 			},
 		};
 
-		test.TestState.AdditionalReferences.AddRange(Utility.GetMetadataReferences());
+		test.TestState.AdditionalReferences.AddRange(Utility.GetAdditionalReferences());
 
 		return test;
 	}

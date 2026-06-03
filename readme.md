@@ -19,7 +19,9 @@ Immediate.Cache is a collection of classes that simplify caching responses from 
 
 ### Creating a Cache
 
-Create a subclass of `ApplicationCacheBase`, which will serve as the cache for a particular handler. An example:
+Create a class and apply the `[CacheFor<>]` attribute, targeting a handler. Add a `TransformKey` method to transform a
+request into a cache key. For example:
+
 ```cs
 [Handler]
 public static partial class GetValue
@@ -33,13 +35,8 @@ public static partial class GetValue
 	) => ValueTask.FromResult(new Response(query.Value));
 }
 
-public sealed class GetValueCache(
-	IMemoryCache memoryCache,
-	Owned<IHandler<GetValue.Query, GetValue.Response>> ownedHandler
-) : ApplicationCacheBase<GetValue.Query, GetValue.Response>(
-	memoryCache,
-	ownedHandler
-)
+[CacheFor<GetValue>]
+public sealed class GetValueCache
 {
 	protected override string TransformKey(GetValue.Query request) =>
 		$"GetValue(query: {request.Value})";
@@ -48,24 +45,15 @@ public sealed class GetValueCache(
 
 In this case, the `GetValueCache` class will serve as a cache for the `GetValue` IH handler.
 
-### Register the Cache with DI
+### Adding generated caches to the `IServiceCollection` collection
 
-In your `Program.cs` file:
+In your `Program.cs`, add a call to `services.AddXxxCaches()`, where Xxx is the application identifier. By default,
+this is the short form of the assembly name. For example:
 
-* Ensure that Memory Cache is registered, by calling:
-```cs
-services.AddMemoryCache();
-```
+* For a project named `Web`, it will be `services.AddWebCaches()`
+* For a project named `Application.Web`, it will be `services.AddApplicationWebCaches()`
 
-* Register `Owned<>` as a singleton
-```cs
-services.AddSingleton(typeof(Owned<>));
-```
-
-* Register your cache service(s) as a singleton(s)
-```cs
-services.AddSingleton<GetValueCache>();
-```
+However, this name can be overridden using `[assembly: ImmediateAssemblyIdentifierAttribute("SomeIdentifier")]`.
 
 ### Retrieve Data From the Cache
 

@@ -21,7 +21,7 @@ public static partial class DelayGetValue
 
 	public sealed record Response(int Value, bool ExecutedHandler, Guid RandomValue);
 
-	private static readonly Lock s_lock = new();
+	private static readonly Lock Lock = new();
 
 	private static async ValueTask<Response> HandleAsync(
 		Query query,
@@ -37,14 +37,14 @@ public static partial class DelayGetValue
 			_ = query.WaitForTestToStartExecuting.TrySetResult();
 			await query.WaitForTestToContinueOperation.Task.WaitAsync(token);
 
-			lock (s_lock)
+			lock (Lock)
 				query.TimesExecuted++;
 
 			return new(query.Value, ExecutedHandler: true, RandomValue: Guid.NewGuid());
 		}
 		catch
 		{
-			lock (s_lock)
+			lock (Lock)
 				query.TimesCancelled++;
 			throw;
 		}
