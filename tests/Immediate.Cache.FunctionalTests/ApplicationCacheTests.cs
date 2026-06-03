@@ -1,3 +1,4 @@
+using Immediate.Cache.Shared;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;

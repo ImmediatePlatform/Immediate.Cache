@@ -2,7 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using Immediate.Handlers.Shared;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Immediate.Cache;
+namespace Immediate.Cache.Shared;
 
 /// <summary>
 ///		Base class for caching the results of an <see cref="IHandler{TRequest, TResponse}"/>.
@@ -19,7 +19,7 @@ namespace Immediate.Cache;
 /// <param name="handler">
 ///		The handler from which to cache data
 /// </param>
-public abstract class ApplicationCacheBase<TRequest, TResponse>(
+public abstract class ApplicationCache<TRequest, TResponse>(
 	IMemoryCache memoryCache,
 	Owned<IHandler<TRequest, TResponse>> handler
 )

@@ -54,15 +54,7 @@ public sealed class OwnedDisposableScopeSuppressor : DiagnosticSuppressor
 				{
 					Arity: 1,
 					Name: "Owned",
-					ContainingNamespace:
-					{
-						Name: "Cache",
-						ContainingNamespace:
-						{
-							Name: "Immediate",
-							ContainingNamespace.IsGlobalNamespace: true,
-						},
-					},
+					ContainingNamespace.IsImmediateCacheShared: true,
 				})
 			{
 				continue;

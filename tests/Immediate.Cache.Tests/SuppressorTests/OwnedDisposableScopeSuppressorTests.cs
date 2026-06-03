@@ -18,7 +18,7 @@ public sealed class OwnedDisposableScopeSuppressorTests
 
 				using System;
 				using System.Threading.Tasks;
-				using Immediate.Cache;
+				using Immediate.Cache.Shared;
 
 				public sealed class Disposable : IDisposable, IAsyncDisposable
 				{
@@ -50,7 +50,7 @@ public sealed class OwnedDisposableScopeSuppressorTests
 
 					using System;
 					using System.Threading.Tasks;
-					using Immediate.Cache;
+					using Immediate.Cache.Shared;
 
 					public sealed class Disposable : IDisposable, IAsyncDisposable
 					{
@@ -84,7 +84,7 @@ public sealed class OwnedDisposableScopeSuppressorTests
 
 					using System;
 					using System.Threading.Tasks;
-					using Immediate.Cache;
+					using Immediate.Cache.Shared;
 
 					public sealed class Disposable : IDisposable, IAsyncDisposable
 					{
@@ -118,7 +118,7 @@ public sealed class OwnedDisposableScopeSuppressorTests
 
 					using System;
 					using System.Threading.Tasks;
-					using Immediate.Cache;
+					using Immediate.Cache.Shared;
 
 					public sealed class Disposable : IDisposable, IAsyncDisposable
 					{
@@ -151,7 +151,7 @@ public sealed class OwnedDisposableScopeSuppressorTests
 
 				using System;
 				using System.Threading.Tasks;
-				using Immediate.Cache;
+				using Immediate.Cache.Shared;
 
 				public sealed class Disposable : IDisposable, IAsyncDisposable
 				{
@@ -189,7 +189,7 @@ public sealed class OwnedDisposableScopeSuppressorTests
 
 				using System;
 				using System.Threading.Tasks;
-				using Immediate.Cache;
+				using Immediate.Cache.Shared;
 
 				public sealed class Disposable : IDisposable, IAsyncDisposable
 				{
@@ -226,7 +226,7 @@ public sealed class OwnedDisposableScopeSuppressorTests
 
 				using System;
 				using System.Threading.Tasks;
-				using Immediate.Cache;
+				using Immediate.Cache.Shared;
 
 				public sealed class Disposable : IDisposable, IAsyncDisposable
 				{

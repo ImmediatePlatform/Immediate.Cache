@@ -24,26 +24,35 @@
 	<PackageReference Include="Immediate.Handlers" />
 	<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
 	<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
+	<PackageReference Include="Scriban" PrivateAssets="all" GeneratePathProperty="true" />
   </ItemGroup>
 
   <ItemGroup>
 	<ProjectReference Include="../Immediate.Cache.Analyzers/Immediate.Cache.Analyzers.csproj" ReferenceOutputAssembly="false" />
+	<ProjectReference Include="../Immediate.Cache.Generators/Immediate.Cache.Generators.csproj" ReferenceOutputAssembly="false" />
 	<ProjectReference Include="../Immediate.Cache.Shared/Immediate.Cache.Shared.csproj" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
 	<None Include="../../readme.md" Pack="true" PackagePath="/" />
 	<None Include="../Immediate.Cache.Analyzers/bin/$(Configuration)/netstandard2.0/Immediate.Cache.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.8/cs" Visible="true" />
+	<None Include="../Immediate.Cache.Generators/bin/$(Configuration)/netstandard2.0/Immediate.Cache.Generators.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.8/cs" Visible="true" />
 
 	<TfmSpecificPackageFile
-	  Include="../Immediate.Cache.Shared/bin/$(Configuration)/$(TargetFramework)/Immediate.Cache.Shared.dll"
-	  Pack="true"
-	  PackagePath="lib/$(TargetFramework)" />
+      Include="$(PkgScriban)/lib/netstandard2.0/Scriban.dll"
+      Pack="true"
+      PackagePath="analyzers/roslyn4.8/dotnet/cs"
+      Condition=" '$(TargetFramework)' == 'net8.0' " />
 
 	<TfmSpecificPackageFile
-	  Include="../Immediate.Cache.Shared/bin/$(Configuration)/$(TargetFramework)/Immediate.Cache.Shared.xml"
-	  Pack="true"
-	  PackagePath="lib/$(TargetFramework)" />
+      Include="../Immediate.Cache.Shared/bin/$(Configuration)/$(TargetFramework)/Immediate.Cache.Shared.dll"
+      Pack="true"
+      PackagePath="lib/$(TargetFramework)" />
+
+	<TfmSpecificPackageFile
+      Include="../Immediate.Cache.Shared/bin/$(Configuration)/$(TargetFramework)/Immediate.Cache.Shared.xml"
+      Pack="true"
+      PackagePath="lib/$(TargetFramework)" />
   </ItemGroup>
 
 </Project>

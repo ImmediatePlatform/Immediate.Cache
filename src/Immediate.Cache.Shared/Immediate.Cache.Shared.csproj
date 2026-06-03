@@ -1,11 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-	<RootNamespace>Immediate.Cache</RootNamespace>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(TargetFramework)' == 'net11.0'">
-	<Features>runtime-async=on</Features>
+    <Features>runtime-async=on</Features>
   </PropertyGroup>
 
   <ItemGroup>

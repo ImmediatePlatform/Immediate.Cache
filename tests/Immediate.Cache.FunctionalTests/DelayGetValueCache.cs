@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Immediate.Cache.Shared;
 using Immediate.Handlers.Shared;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -7,7 +8,7 @@ namespace Immediate.Cache.FunctionalTests;
 public sealed class DelayGetValueCache(
 	IMemoryCache memoryCache,
 	Owned<IHandler<DelayGetValue.Query, DelayGetValue.Response>> ownedHandler
-) : ApplicationCacheBase<DelayGetValue.Query, DelayGetValue.Response>(
+) : ApplicationCache<DelayGetValue.Query, DelayGetValue.Response>(
 	memoryCache,
 	ownedHandler
 )
