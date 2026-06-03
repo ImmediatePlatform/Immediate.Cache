@@ -4,12 +4,14 @@
 	<RootNamespace>Immediate.Cache</RootNamespace>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net11.0'">
+	<Features>runtime-async=on</Features>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="DotNet.ReproducibleBuilds" PrivateAssets="All" />
-    <PackageReference Include="Immediate.Handlers" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
-	<PackageReference Include="MinVer" PrivateAssets="all" />
+	<PackageReference Include="Immediate.Handlers" />
+	<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
+	<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
   </ItemGroup>
 
 </Project>
