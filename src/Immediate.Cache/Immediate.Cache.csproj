@@ -21,11 +21,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-	<PackageReference Include="DotNet.ReproducibleBuilds" PrivateAssets="All" />
 	<PackageReference Include="Immediate.Handlers" />
 	<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
 	<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
-	<PackageReference Include="MinVer" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>
