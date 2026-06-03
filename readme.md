@@ -6,6 +6,7 @@
 [![GitHub issues](https://img.shields.io/github/issues/ImmediatePlatform/Immediate.Cache.svg)](https://GitHub.com/ImmediatePlatform/Immediate.Cache/issues/) 
 [![GitHub issues-closed](https://img.shields.io/github/issues-closed/ImmediatePlatform/Immediate.Cache.svg)](https://GitHub.com/ImmediatePlatform/Immediate.Cache/issues?q=is%3Aissue+is%3Aclosed) 
 [![GitHub Actions](https://github.com/ImmediatePlatform/Immediate.Cache/actions/workflows/build.yml/badge.svg)](https://github.com/ImmediatePlatform/Immediate.Cache/actions)
+[![Coverage Status](https://coveralls.io/repos/github/ImmediatePlatform/Immediate.Cache/badge.svg)](https://coveralls.io/github/ImmediatePlatform/Immediate.Cache)
 ---
 
 Immediate.Cache is a collection of classes that simplify caching responses from [Immediate.Handlers](https://github.com/ImmediatePlatform/Immediate.Handlers) handlers.
