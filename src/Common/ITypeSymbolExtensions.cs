@@ -18,20 +18,30 @@ internal static class ITypeSymbolExtensions
 		public bool IsHandlerAttribute =>
 			typeSymbol is INamedTypeSymbol
 			{
+				Arity: 0,
 				Name: "HandlerAttribute",
 				ContainingNamespace.IsImmediateHandlersShared: true,
+			};
+
+		public bool IsHandler =>
+			typeSymbol is INamedTypeSymbol
+			&& typeSymbol.GetAttributes().Any(a => a.AttributeClass.IsHandlerAttribute);
+
+		public bool IsCacheForAttribute =>
+			typeSymbol is INamedTypeSymbol
+			{
+				Arity: 1,
+				Name: "CacheForAttribute",
+				ContainingNamespace.IsImmediateCacheShared: true,
 			};
 	}
 
 	extension(INamedTypeSymbol typeSymbol)
 	{
-		public bool GetValidHandleMethod([NotNullWhen(true)] out ITypeSymbol? requestType, [NotNullWhen(true)] out ITypeSymbol? responseType)
+		public IMethodSymbol? GetHandleMethod()
 		{
-			requestType = null;
-			responseType = null;
-
-			if (!typeSymbol.GetAttributes().Any(a => a.AttributeClass.IsHandlerAttribute))
-				return false;
+			if (!typeSymbol.IsHandler)
+				return null;
 
 			if (typeSymbol
 					.GetMembers()
@@ -40,8 +50,19 @@ internal static class ITypeSymbolExtensions
 					.Take(2)
 					.ToList() is not [var handleMethod])
 			{
-				return false;
+				return null;
 			}
+
+			return handleMethod;
+		}
+
+		public bool GetValidHandleMethod([NotNullWhen(true)] out ITypeSymbol? requestType, [NotNullWhen(true)] out ITypeSymbol? responseType)
+		{
+			requestType = null;
+			responseType = null;
+
+			if (typeSymbol.GetHandleMethod() is not { } handleMethod)
+				return false;
 
 			// must have request type
 			if (handleMethod.Parameters is not [{ Type: ITypeSymbol parameterType }, ..])
