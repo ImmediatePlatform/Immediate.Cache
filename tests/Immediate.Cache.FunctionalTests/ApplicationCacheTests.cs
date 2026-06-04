@@ -1,4 +1,3 @@
-using Immediate.Cache.Shared;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
@@ -12,10 +11,8 @@ public sealed class ApplicationCacheTests
 	public ApplicationCacheTests()
 	{
 		var services = new ServiceCollection();
+		_ = services.AddImmediateCacheFunctionalTestsCaches();
 		_ = services.AddImmediateCacheFunctionalTestsHandlers();
-		_ = services.AddSingleton<GetValueCache>();
-		_ = services.AddSingleton<DelayGetValueCache>();
-		_ = services.AddSingleton(typeof(Owned<>));
 		_ = services.AddMemoryCache();
 
 		_serviceProvider = services.BuildServiceProvider();

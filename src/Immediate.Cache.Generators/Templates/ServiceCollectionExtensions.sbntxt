@@ -18,6 +18,7 @@ public static partial class CacheServiceCollectionExtensions
 		global::Microsoft.Extensions.DependencyInjection.Extensions.ServiceCollectionDescriptorExtensions.Add(
 			services,
 			global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor.Singleton(
+				typeof(global::{{~ if !string.empty c.namespace; c.namespace; "."; end }}{{ c.class_name }}),
 				typeof(global::{{~ if !string.empty c.namespace; c.namespace; "."; end }}{{ c.class_name }})
 			)
 		);
@@ -26,6 +27,7 @@ public static partial class CacheServiceCollectionExtensions
 		global::Microsoft.Extensions.DependencyInjection.Extensions.ServiceCollectionDescriptorExtensions.TryAdd(
 			services,
 			global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor.Singleton(
+				typeof(global::Immediate.Cache.Shared.Owned<>),
 				typeof(global::Immediate.Cache.Shared.Owned<>)
 			)
 		);

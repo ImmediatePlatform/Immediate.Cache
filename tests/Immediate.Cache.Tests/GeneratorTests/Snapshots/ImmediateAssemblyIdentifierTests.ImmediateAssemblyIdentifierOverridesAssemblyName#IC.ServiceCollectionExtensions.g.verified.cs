@@ -13,6 +13,7 @@ public static partial class CacheServiceCollectionExtensions
 		global::Microsoft.Extensions.DependencyInjection.Extensions.ServiceCollectionDescriptorExtensions.Add(
 			services,
 			global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor.Singleton(
+				typeof(global::Dummy.GetUsersQueryCache),
 				typeof(global::Dummy.GetUsersQueryCache)
 			)
 		);
@@ -20,6 +21,7 @@ public static partial class CacheServiceCollectionExtensions
 		global::Microsoft.Extensions.DependencyInjection.Extensions.ServiceCollectionDescriptorExtensions.TryAdd(
 			services,
 			global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor.Singleton(
+				typeof(global::Immediate.Cache.Shared.Owned<>),
 				typeof(global::Immediate.Cache.Shared.Owned<>)
 			)
 		);
