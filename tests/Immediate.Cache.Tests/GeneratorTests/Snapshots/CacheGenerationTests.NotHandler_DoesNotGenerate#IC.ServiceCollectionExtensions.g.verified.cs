@@ -10,7 +10,7 @@ public static partial class CacheServiceCollectionExtensions
 		this global::Microsoft.Extensions.DependencyInjection.IServiceCollection services
 	)
 	{
-		global::Microsoft.Extensions.DependencyInjection.Extensions.ServiceCollectionDescriptorExtensions.Add(
+		global::Microsoft.Extensions.DependencyInjection.Extensions.ServiceCollectionDescriptorExtensions.TryAdd(
 			services,
 			global::Microsoft.Extensions.DependencyInjection.ServiceDescriptor.Singleton(
 				typeof(global::Immediate.Cache.Shared.Owned<>)
