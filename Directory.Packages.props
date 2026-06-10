@@ -1,11 +1,15 @@
 <Project>
   <PropertyGroup>
 	<ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
+	<Net9PackageVersion>9.0.17</Net9PackageVersion>
+	<Net10PackageVersion>10.0.9</Net10PackageVersion>
+	<Net11PackageVersion>11.0.0-preview.5.26302.115</Net11PackageVersion>
   </PropertyGroup>
 
   <ItemGroup>
 	<PackageVersion Include="AssemblyMetadata.Generators" Version="2.2.0" />
-	<PackageVersion Include="Immediate.Handlers" Version="3.8.0" />
+	<PackageVersion Include="Immediate.Handlers" Version="3.8.1" />
 	<PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
 	<PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.3.0" />
 	<PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="4.8.0" />
@@ -14,9 +18,9 @@
 	<PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.8.0" />
 	<!-- Locked until https://github.com/microsoft/codecoverage/issues/221 resolved -->
 	<PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="[18.4.1]" />
-	<PackageVersion Include="Scriban" Version="7.2.3" />
+	<PackageVersion Include="Scriban" Version="7.2.4" />
 	<PackageVersion Include="Verify.SourceGenerators" Version="2.5.0" />
-	<PackageVersion Include="Verify.XunitV3" Version="31.18.0" />
+	<PackageVersion Include="Verify.XunitV3" Version="31.19.1" />
 	<PackageVersion Include="xunit.v3.mtp-v2" Version="3.2.2" />
   </ItemGroup>
 
@@ -32,34 +36,34 @@
   <ItemGroup Condition="$(TargetFramework) == 'net9.0'">
 	<PackageVersion Include="Basic.Reference.Assemblies.Net90" Version="1.8.8" />
 	<PackageVersion Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0" />
-	<PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.16" />
-	<PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.16" />
-	<PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="9.0.16" />
-	<PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.16" />
+	<PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="$(Net9PackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="$(Net9PackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(Net9PackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(Net9PackageVersion)" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework) == 'net10.0'">
 	<PackageVersion Include="Basic.Reference.Assemblies.Net100" Version="1.8.8" />
 	<PackageVersion Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.300" />
-	<PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="10.0.8" />
-	<PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="10.0.8" />
-	<PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.8" />
-	<PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.8" />
+	<PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="$(Net10PackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="$(Net10PackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(Net10PackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(Net10PackageVersion)" />
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework) == 'net11.0'">
 	<PackageVersion Include="Basic.Reference.Assemblies.Net110" Version="1.8.8" />
-	<PackageVersion Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="11.0.100-preview.4.26230.115" />
-	<PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="11.0.0-preview.4.26230.115" />
-	<PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="11.0.0-preview.4.26230.115" />
-	<PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="11.0.0-preview.4.26230.115" />
-	<PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="11.0.0-preview.4.26230.115" />
+	<PackageVersion Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="11.0.100-preview.5.26302.115" />
+	<PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="$(Net11PackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="$(Net11PackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="$(Net11PackageVersion)" />
+	<PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(Net11PackageVersion)" />
   </ItemGroup>
 
   <ItemGroup>
 	<GlobalPackageReference Include="DotNet.ReproducibleBuilds" Version="2.0.2" PrivateAssets="All" />
-	<GlobalPackageReference Include="Meziantou.Analyzer" Version="3.0.98" PrivateAssets="All" />
-	<GlobalPackageReference Include="Meziantou.Polyfill" Version="1.0.140" PrivateAssets="All" />
+	<GlobalPackageReference Include="Meziantou.Analyzer" Version="3.0.102" PrivateAssets="All" />
+	<GlobalPackageReference Include="Meziantou.Polyfill" Version="1.0.150" PrivateAssets="All" />
 	<GlobalPackageReference Include="MinVer" Version="7.0.0" PrivateAssets="All" />
   </ItemGroup>
 </Project>
