@@ -43,7 +43,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="$(TargetFramework) == 'net10.0'">
-	<PackageVersion Include="Basic.Reference.Assemblies.Net100" Version="1.8.8" />
+	<PackageVersion Include="Basic.Reference.Assemblies.Net100" Version="1.8.9" />
 	<PackageVersion Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="10.0.300" />
 	<PackageVersion Include="Microsoft.Extensions.Caching.Abstractions" Version="$(Net10PackageVersion)" />
 	<PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="$(Net10PackageVersion)" />
