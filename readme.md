@@ -24,12 +24,12 @@ request into a cache key. For example:
 
 ```cs
 [Handler]
-public static partial class GetValue
+public sealed partial class GetValue
 {
 	public sealed record Query(int Value);
 	public sealed record Response(int Value);
 
-	private static ValueTask<Response> HandleAsync(
+	private ValueTask<Response> HandleAsync(
 		Query query,
 		CancellationToken _
 	) => ValueTask.FromResult(new Response(query.Value));
