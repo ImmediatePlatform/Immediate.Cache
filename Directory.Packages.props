@@ -13,7 +13,8 @@
 	<PackageVersion Include="Microsoft.Bcl.HashCode" Version="6.0.0" />
 	<PackageVersion Include="Microsoft.CodeAnalysis.Analyzers" Version="5.3.0" />
 	<PackageVersion Include="Microsoft.CodeAnalysis.CSharp.Analyzer.Testing" Version="1.1.4" />
-	<PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="18.9.0" />
+	<!-- Locked until https://github.com/microsoft/codecoverage/issues/221 resolved -->
+	<PackageVersion Include="Microsoft.Testing.Extensions.CodeCoverage" Version="[18.4.1]" />
 	<PackageVersion Include="Scriban" Version="7.2.5" />
 	<PackageVersion Include="Verify.SourceGenerators" Version="2.5.0" />
 	<PackageVersion Include="Verify.XunitV3" Version="31.20.0" />
