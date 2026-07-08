@@ -24,7 +24,6 @@
 	<PackageReference Include="Immediate.Handlers" />
 	<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
 	<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
-	<PackageReference Include="Scriban" PrivateAssets="all" GeneratePathProperty="true" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,26 +32,57 @@
 	<ProjectReference Include="../Immediate.Cache.Shared/Immediate.Cache.Shared.csproj" PrivateAssets="All" />
   </ItemGroup>
 
+  <!--
+	This ensures the library will be packaged as a source generator when we use `dotnet pack`
+	-->
   <ItemGroup>
 	<None Include="../../readme.md" Pack="true" PackagePath="/" />
-	<None Include="../Immediate.Cache.Analyzers/bin/$(Configuration)/netstandard2.0/Immediate.Cache.Analyzers.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.8/cs" Visible="true" />
-	<None Include="../Immediate.Cache.Generators/bin/$(Configuration)/netstandard2.0/Immediate.Cache.Generators.dll" Pack="true" PackagePath="analyzers/dotnet/roslyn4.8/cs" Visible="true" />
+
+	<!-- IH.Shared -->
+	<TfmSpecificPackageFile
+	  Include="../Immediate.Cache.Shared/bin/$(Configuration)/$(TargetFramework)/Immediate.Cache.Shared.dll"
+	  Pack="true"
+	  PackagePath="lib/$(TargetFramework)" />
 
 	<TfmSpecificPackageFile
-      Include="$(PkgScriban)/lib/netstandard2.0/Scriban.dll"
-      Pack="true"
-      PackagePath="analyzers/dotnet/roslyn4.8/cs"
-      Condition=" '$(TargetFramework)' == 'net8.0' " />
+	  Include="../Immediate.Cache.Shared/bin/$(Configuration)/$(TargetFramework)/Immediate.Cache.Shared.xml"
+	  Pack="true"
+	  PackagePath="lib/$(TargetFramework)" />
+  </ItemGroup>
+
+  <!-- roslyn 4.8 for net8/net9 -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+	<TfmSpecificPackageFile
+	  Include="../Immediate.Cache.Analyzers/bin/$(Configuration)/netstandard2.0/Immediate.Cache.Analyzers.dll"
+	  Pack="true"
+	  PackagePath="analyzers/dotnet/roslyn4.8/cs" />
 
 	<TfmSpecificPackageFile
-      Include="../Immediate.Cache.Shared/bin/$(Configuration)/$(TargetFramework)/Immediate.Cache.Shared.dll"
-      Pack="true"
-      PackagePath="lib/$(TargetFramework)" />
+	  Include="../Immediate.Cache.Generators/bin/$(Configuration)/netstandard2.0/Immediate.Cache.Generators.dll"
+	  Pack="true"
+	  PackagePath="analyzers/dotnet/roslyn4.8/cs" />
+  </ItemGroup>
+
+  <!-- roslyn 5.0 for net10/net11 -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
+	<TfmSpecificPackageFile
+	  Include="../Immediate.Cache.Analyzers/bin/$(Configuration)/net10.0/Immediate.Cache.Analyzers.dll"
+	  Pack="true"
+	  PackagePath="analyzers/dotnet/roslyn5.0/cs" />
 
 	<TfmSpecificPackageFile
-      Include="../Immediate.Cache.Shared/bin/$(Configuration)/$(TargetFramework)/Immediate.Cache.Shared.xml"
-      Pack="true"
-      PackagePath="lib/$(TargetFramework)" />
+	  Include="../Immediate.Cache.Generators/bin/$(Configuration)/net10.0/Immediate.Cache.Generators.dll"
+	  Pack="true"
+	  PackagePath="analyzers/dotnet/roslyn5.0/cs" />
+
+	<TfmSpecificPackageFile
+	  Include="$(PkgScriban)/lib/net8.0/Scriban.dll"
+	  Pack="true"
+	  PackagePath="analyzers/dotnet/roslyn5.0/cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<PackageReference Include="Scriban" PrivateAssets="all" GeneratePathProperty="true" />
   </ItemGroup>
 
 </Project>
