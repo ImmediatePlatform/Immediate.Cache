@@ -14,7 +14,7 @@ public sealed partial class ImmediateCacheGenerator
 		if (context.Attributes is not [{ AttributeClass.TypeArguments: [INamedTypeSymbol { IsStatic: false } handlerSymbol] }])
 			return null;
 
-		var @namespace = targetSymbol.ContainingNamespace.ToString().NullIf("<global namespace>");
+		var @namespace = targetSymbol.ContainingNamespace.ToDisplayString().NullIf("<global namespace>");
 		var name = targetSymbol.Name;
 
 		if (!handlerSymbol.GetValidHandleMethod(out var requestType, out var responseType))
