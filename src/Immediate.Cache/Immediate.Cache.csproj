@@ -58,11 +58,6 @@
 	  PackagePath="analyzers/dotnet/roslyn4.8/cs" />
 
 	<TfmSpecificPackageFile
-	  Include="../Immediate.Cache.CodeFixes/bin/$(Configuration)/netstandard2.0/Immediate.Cache.CodeFixes.dll"
-	  Pack="true"
-	  PackagePath="analyzers/dotnet/roslyn4.8/cs" />
-
-	<TfmSpecificPackageFile
 	  Include="../Immediate.Cache.Generators/bin/$(Configuration)/netstandard2.0/Immediate.Cache.Generators.dll"
 	  Pack="true"
 	  PackagePath="analyzers/dotnet/roslyn4.8/cs" />
@@ -72,11 +67,6 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
 	<TfmSpecificPackageFile
 	  Include="../Immediate.Cache.Analyzers/bin/$(Configuration)/net10.0/Immediate.Cache.Analyzers.dll"
-	  Pack="true"
-	  PackagePath="analyzers/dotnet/roslyn5.0/cs" />
-
-	<TfmSpecificPackageFile
-	  Include="../Immediate.Cache.CodeFixes/bin/$(Configuration)/net10.0/Immediate.Cache.CodeFixes.dll"
 	  Pack="true"
 	  PackagePath="analyzers/dotnet/roslyn5.0/cs" />
 
