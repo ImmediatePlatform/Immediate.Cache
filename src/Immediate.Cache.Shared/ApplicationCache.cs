@@ -23,8 +23,8 @@ public abstract class ApplicationCache<TRequest, TResponse>(
 	IMemoryCache memoryCache,
 	Owned<IHandler<TRequest, TResponse>> handler
 )
-	where TRequest : class
-	where TResponse : class
+	where TRequest : class?
+	where TResponse : class?
 {
 	private readonly Lock _lock = new();
 
@@ -57,8 +57,6 @@ public abstract class ApplicationCache<TRequest, TResponse>(
 
 	private CacheValue GetCacheValue(TRequest request)
 	{
-		ArgumentNullException.ThrowIfNull(request);
-
 		var key = TransformKey(request);
 
 		if (!memoryCache.TryGetValue(key, out var result))
@@ -76,7 +74,10 @@ public abstract class ApplicationCache<TRequest, TResponse>(
 			}
 		}
 
-		return (CacheValue)result!;
+		if (result is not CacheValue cacheValue)
+			throw new InvalidOperationException($"An unknown type has been stored as the cache value for key `{key}`; Immediate.Cache is unable to operate.");
+
+		return cacheValue;
 	}
 
 	/// <summary>
