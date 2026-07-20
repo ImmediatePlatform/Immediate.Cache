@@ -91,6 +91,7 @@ public sealed class CacheGenerationTests
 		Assert.Equal(
 			[
 				"Immediate.Cache.Generators/Immediate.Cache.Generators.ImmediateCacheGenerator/IC.ServiceCollectionExtensions.g.cs",
+				"Immediate.Handlers.Generators/Immediate.Handlers.Generators.ImmediateHandlersGenerator/IH.ServiceCollectionExtensions.g.cs",
 			],
 			result.GeneratedTrees.Select(t => t.FilePath.Replace('\\', '/'))
 		);
