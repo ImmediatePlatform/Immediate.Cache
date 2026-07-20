@@ -23,8 +23,8 @@ public abstract class ApplicationCache<TRequest, TResponse>(
 	IMemoryCache memoryCache,
 	Owned<IHandler<TRequest, TResponse>> handler
 )
-	where TRequest : class
-	where TResponse : class
+	where TRequest : class?
+	where TResponse : class?
 {
 	private readonly Lock _lock = new();
 
