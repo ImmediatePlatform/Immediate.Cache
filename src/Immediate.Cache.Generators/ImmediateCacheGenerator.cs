@@ -76,6 +76,7 @@ file static class Extensions
 		return (compilation.AssemblyName ?? string.Empty)
 			.Replace(".", string.Empty, StringComparison.Ordinal)
 			.Replace(" ", string.Empty, StringComparison.Ordinal)
+			.Replace("-", string.Empty, StringComparison.Ordinal)
 			.Trim();
 	}
 }
