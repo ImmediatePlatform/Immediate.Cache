@@ -3,6 +3,9 @@
   <PropertyGroup>
 	<IsPackable>true</IsPackable>
 	<IncludeBuildOutput>false</IncludeBuildOutput>
+
+	<EnablePackageValidation>true</EnablePackageValidation>
+	<PackageValidationBaselineVersion>2.0.0</PackageValidationBaselineVersion>
   </PropertyGroup>
 
   <PropertyGroup Label="Nuget">
@@ -22,14 +25,8 @@
 
   <ItemGroup>
 	<PackageReference Include="Immediate.Handlers" />
-	<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" />
-	<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
-  </ItemGroup>
-
-  <ItemGroup>
-	<ProjectReference Include="../Immediate.Cache.Analyzers/Immediate.Cache.Analyzers.csproj" ReferenceOutputAssembly="false" />
-	<ProjectReference Include="../Immediate.Cache.Generators/Immediate.Cache.Generators.csproj" ReferenceOutputAssembly="false" />
-	<ProjectReference Include="../Immediate.Cache.Shared/Immediate.Cache.Shared.csproj" PrivateAssets="All" />
+	<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" NoWarn="NU5104" />
+	<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" NoWarn="NU5104" />
   </ItemGroup>
 
   <!--
@@ -50,39 +47,76 @@
 	  PackagePath="lib/$(TargetFramework)" />
   </ItemGroup>
 
-  <!-- roslyn 4.8 for net8/net9 -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-	<TfmSpecificPackageFile
-	  Include="../Immediate.Cache.Analyzers/bin/$(Configuration)/netstandard2.0/Immediate.Cache.Analyzers.dll"
+  <ItemGroup>
+	<None
+	  Include="../Immediate.Cache.Analyzers/bin/$(Configuration)/roslyn4.8/Immediate.Cache.Analyzers.dll"
 	  Pack="true"
 	  PackagePath="analyzers/dotnet/roslyn4.8/cs" />
 
-	<TfmSpecificPackageFile
-	  Include="../Immediate.Cache.Generators/bin/$(Configuration)/netstandard2.0/Immediate.Cache.Generators.dll"
+	<None
+	  Include="../Immediate.Cache.Generators/bin/$(Configuration)/roslyn4.8/Immediate.Cache.Generators.dll"
 	  Pack="true"
 	  PackagePath="analyzers/dotnet/roslyn4.8/cs" />
   </ItemGroup>
 
-  <!-- roslyn 5.0 for net10/net11 -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net10.0'">
-	<TfmSpecificPackageFile
-	  Include="../Immediate.Cache.Analyzers/bin/$(Configuration)/net10.0/Immediate.Cache.Analyzers.dll"
+  <ItemGroup>
+	<None
+	  Include="../Immediate.Cache.Analyzers/bin/$(Configuration)/roslyn5.0/Immediate.Cache.Analyzers.dll"
+	  Pack="true"
+	  PackagePath="analyzers/dotnet/roslyn5.0/cs" />
+
+	<None
+	  Include="../Immediate.Cache.Generators/bin/$(Configuration)/roslyn5.0/Immediate.Cache.Generators.dll"
 	  Pack="true"
 	  PackagePath="analyzers/dotnet/roslyn5.0/cs" />
 
 	<TfmSpecificPackageFile
-	  Include="../Immediate.Cache.Generators/bin/$(Configuration)/net10.0/Immediate.Cache.Generators.dll"
-	  Pack="true"
-	  PackagePath="analyzers/dotnet/roslyn5.0/cs" />
-
-	<TfmSpecificPackageFile
+	  Condition=" '$(TargetFramework)' == 'net8.0' "
 	  Include="$(PkgScriban)/lib/net8.0/Scriban.dll"
 	  Pack="true"
 	  PackagePath="analyzers/dotnet/roslyn5.0/cs" />
   </ItemGroup>
 
   <ItemGroup>
+	<None
+	  Include="../Immediate.Cache.Analyzers/bin/$(Configuration)/roslyn5.9/Immediate.Cache.Analyzers.dll"
+	  Pack="true"
+	  PackagePath="analyzers/dotnet/roslyn5.9/cs" />
+
+	<None
+	  Include="../Immediate.Cache.Generators/bin/$(Configuration)/roslyn5.9/Immediate.Cache.Generators.dll"
+	  Pack="true"
+	  PackagePath="analyzers/dotnet/roslyn5.9/cs" />
+
+	<TfmSpecificPackageFile
+	  Condition=" '$(TargetFramework)' == 'net8.0' "
+	  Include="$(PkgScriban)/lib/net8.0/Scriban.dll"
+	  Pack="true"
+	  PackagePath="analyzers/dotnet/roslyn5.9/cs" />
+  </ItemGroup>
+
+  <ItemGroup>
 	<PackageReference Include="Scriban" PrivateAssets="all" GeneratePathProperty="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="../Immediate.Cache.Shared/Immediate.Cache.Shared.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <PropertyGroup>
+	<RoslynVersion Condition=" '$(TargetFramework)' == 'net8.0' ">roslyn4.8</RoslynVersion>
+	<RoslynVersion Condition=" '$(TargetFramework)' == 'net10.0' ">roslyn5.0</RoslynVersion>
+	<RoslynVersion Condition=" '$(TargetFramework)' == 'net11.0' ">roslyn5.9</RoslynVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="../../src/Immediate.Cache.Analyzers/Immediate.Cache.Analyzers.csproj" ReferenceOutputAssembly="false">
+	  <SetTargetFramework>TargetFramework=$(RoslynVersion)</SetTargetFramework>
+	</ProjectReference>
+
+	<ProjectReference Include="../../src/Immediate.Cache.Generators/Immediate.Cache.Generators.csproj" ReferenceOutputAssembly="false">
+	  <SetTargetFramework>TargetFramework=$(RoslynVersion)</SetTargetFramework>
+	</ProjectReference>
   </ItemGroup>
 
 </Project>

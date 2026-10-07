@@ -4,7 +4,12 @@
 	<OutputType>Exe</OutputType>
   </PropertyGroup>
 
+  <ItemGroup Label="Usings">
+	<Using Include="Xunit" />
+  </ItemGroup>
+
   <ItemGroup>
+	<PackageReference Include="Immediate.Handlers" />
 	<PackageReference Include="Microsoft.Extensions.Caching.Memory" />
 	<PackageReference Include="Microsoft.Extensions.DependencyInjection" />
 	<PackageReference Include="Microsoft.Testing.Extensions.CodeCoverage" />
@@ -12,9 +17,23 @@
   </ItemGroup>
 
   <ItemGroup>
-	<ProjectReference Include="..\..\src\Immediate.Cache.Analyzers\Immediate.Cache.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-	<ProjectReference Include="..\..\src\Immediate.Cache.Generators\Immediate.Cache.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-	<ProjectReference Include="..\..\src\Immediate.Cache.Shared\Immediate.Cache.Shared.csproj" />
+	<ProjectReference Include="../../src/Immediate.Cache.Shared/Immediate.Cache.Shared.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+	<RoslynVersion Condition=" '$(TargetFramework)' == 'net8.0' ">roslyn4.8</RoslynVersion>
+	<RoslynVersion Condition=" '$(TargetFramework)' == 'net10.0' ">roslyn5.0</RoslynVersion>
+	<RoslynVersion Condition=" '$(TargetFramework)' == 'net11.0' ">roslyn5.9</RoslynVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<ProjectReference Include="../../src/Immediate.Cache.Analyzers/Immediate.Cache.Analyzers.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false">
+	  <SetTargetFramework>TargetFramework=$(RoslynVersion)</SetTargetFramework>
+	</ProjectReference>
+
+	<ProjectReference Include="../../src/Immediate.Cache.Generators/Immediate.Cache.Generators.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false">
+	  <SetTargetFramework>TargetFramework=$(RoslynVersion)</SetTargetFramework>
+	</ProjectReference>
   </ItemGroup>
 
 </Project>

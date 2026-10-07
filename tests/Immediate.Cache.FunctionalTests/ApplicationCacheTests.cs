@@ -1,6 +1,6 @@
+using System.Globalization;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
-using Xunit;
 
 namespace Immediate.Cache.FunctionalTests;
 
@@ -29,7 +29,7 @@ public sealed class ApplicationCacheTests
 		Assert.True(response.ExecutedHandler);
 
 		var memoryCache = _serviceProvider.GetRequiredService<IMemoryCache>();
-		Assert.True(memoryCache.TryGetValue($"GetValue(query: {request.Value})", out var _));
+		Assert.True(memoryCache.TryGetValue(string.Create(CultureInfo.InvariantCulture, $"GetValue(query: {request.Value})"), out var _));
 	}
 
 	[Fact]
@@ -40,7 +40,7 @@ public sealed class ApplicationCacheTests
 		cache.SetValue(request, new(4, ExecutedHandler: false));
 
 		var memoryCache = _serviceProvider.GetRequiredService<IMemoryCache>();
-		Assert.True(memoryCache.TryGetValue($"GetValue(query: {request.Value})", out var _));
+		Assert.True(memoryCache.TryGetValue(string.Create(CultureInfo.InvariantCulture, $"GetValue(query: {request.Value})"), out var _));
 
 		var response = await cache.GetValue(request, TestContext.Current.CancellationToken);
 
