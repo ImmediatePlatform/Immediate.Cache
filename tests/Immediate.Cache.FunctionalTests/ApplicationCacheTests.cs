@@ -421,4 +421,65 @@ public sealed class ApplicationCacheTests
 		Assert.Equal(12, transformedResponse2.Value);
 		Assert.Equal(2, transformation2.TimesExecuted);
 	}
+
+	[Fact]
+	public async Task GetValueWorksWhenRepeatedCallAfterFail()
+	{
+		var query = new FailingLoad.Query { Key = "Load fails" };
+
+		var cache = _serviceProvider.GetRequiredService<FailingLoadCache>();
+		var waiting = cache.GetValue(query, TestContext.Current.CancellationToken);
+
+		await query.Started.Task;
+
+		query.Release.SetResult();
+
+		// caller waiting during the load
+		await ValidateFailingLoad(waiting);
+
+		// caller arriving afterwards
+		await ValidateFailingLoad(cache.GetValue(query, TestContext.Current.CancellationToken));
+
+		cache.RemoveValue(query);
+
+		// caller after another RemoveValue
+		await ValidateFailingLoad(cache.GetValue(query, TestContext.Current.CancellationToken));
+	}
+
+	[Fact]
+	public async Task GetValueWorksWhenRepeatedCallAfterFailAndRemove()
+	{
+		var query = new FailingLoad.Query { Key = "Load fails after RemoveValue" };
+
+		var cache = _serviceProvider.GetRequiredService<FailingLoadCache>();
+		var waiting = cache.GetValue(query, TestContext.Current.CancellationToken);
+
+		await query.Started.Task;
+
+		cache.RemoveValue(query);
+
+		query.Release.SetResult();
+
+		// caller waiting during the load
+		await ValidateFailingLoad(waiting);
+
+		// caller arriving afterwards
+		await ValidateFailingLoad(cache.GetValue(query, TestContext.Current.CancellationToken));
+
+		cache.RemoveValue(query);
+
+		// caller after another RemoveValue
+		await ValidateFailingLoad(cache.GetValue(query, TestContext.Current.CancellationToken));
+	}
+
+	private static async Task ValidateFailingLoad(ValueTask<string> task)
+	{
+		var ex = await Assert.ThrowsAsync<FailingLoad.FailingLoadException>(
+			async () => await task
+				.AsTask()
+				.WaitAsync(TimeSpan.FromMinutes(3), TestContext.Current.CancellationToken)
+		);
+
+		Assert.Equal(FailingLoad.FailingLoadMessage, ex.Message);
+	}
 }

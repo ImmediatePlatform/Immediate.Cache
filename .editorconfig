@@ -260,8 +260,8 @@ csharp_style_prefer_top_level_statements = true:silent
 csharp_style_prefer_tuple_swap = true:suggestion
 csharp_style_prefer_utf8_string_literals = true:suggestion
 csharp_style_throw_expression = true:warning
-csharp_style_unused_value_assignment_preference = discard_variable:warning
-csharp_style_unused_value_expression_statement_preference = discard_variable:warning
+csharp_style_unused_value_assignment_preference = discard_variable:suggestion
+csharp_style_unused_value_expression_statement_preference = discard_variable:suggestion
 
 # New Lines
 csharp_style_allow_embedded_statements_on_same_line_experimental = true:silent
@@ -321,6 +321,7 @@ dotnet_diagnostic.CA2007.severity = error               # CA2007: Consider calli
 
 [tests/**.cs]
 
+dotnet_diagnostic.CA1062.severity = none                # CA1062: Validate arguments of public methods
 dotnet_diagnostic.CA1707.severity = none                # CA1707: Identifiers should not contain underscores
 dotnet_diagnostic.CA1724.severity = none                # CA1724: Type names should not match namespaces
 dotnet_diagnostic.CA1822.severity = none                # CA1822: Mark members as static

@@ -224,9 +224,16 @@ public abstract class ApplicationCache<TRequest, TResponse>(
 				{
 					lock (_lock)
 					{
+						// if token source has been cancelled (aka `RemoveValue` or `SetValue`)
+						// then finish the loop and quite or try again
 						if (!tokenSource.IsCancellationRequested)
+						{
 							_responseSource?.SetException(ex);
-						return;
+
+							// only return if we have an exception and that is the final value
+							// of this handler
+							return;
+						}
 					}
 				}
 
