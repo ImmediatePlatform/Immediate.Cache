@@ -19,6 +19,15 @@
 	<EmbedUntrackedSources>true</EmbedUntrackedSources>
   </PropertyGroup>
 
+  <PropertyGroup Label="Message Suppression">
+	<!-- 
+	  I refuse to play these games, even I am already supporting the library;
+	  also: reduces unnecessary annual churn
+	-->
+	<Verify_SponsorshipLicenseIgnored>true</Verify_SponsorshipLicenseIgnored>
+	<NoWarn>$(NoWarn);SC023</NoWarn>
+  </PropertyGroup>
+
   <PropertyGroup Label="Enabled Polyfills">
 	<!--https://github.com/meziantou/Meziantou.Polyfill?tab=readme-ov-file#supported-polyfills-->
 	<Polyfill></Polyfill>
