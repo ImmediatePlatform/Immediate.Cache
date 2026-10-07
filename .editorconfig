@@ -326,4 +326,6 @@ dotnet_diagnostic.CA1724.severity = none                # CA1724: Type names sho
 dotnet_diagnostic.CA1822.severity = none                # CA1822: Mark members as static
 dotnet_diagnostic.CA1873.severity = none                # CA1873: Evaluation of this argument may be expensive and unnecessary if logging is disabled
 
+dotnet_diagnostic.MA0002.severity = none                # MA0002: IEqualityComparer<string> or IComparer<string> is missing
+
 dotnet_diagnostic.xUnit2029.severity = none             # xUnit2029: Do not use Assert.Empty to check if a value does not exist in a collection
