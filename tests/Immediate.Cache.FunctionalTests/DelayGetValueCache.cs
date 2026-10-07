@@ -1,4 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
 using Immediate.Cache.Shared;
 
 namespace Immediate.Cache.FunctionalTests;
@@ -6,11 +5,6 @@ namespace Immediate.Cache.FunctionalTests;
 [CacheFor<DelayGetValue>]
 public sealed partial class DelayGetValueCache
 {
-	[SuppressMessage(
-		"Design",
-		"CA1062:Validate arguments of public methods",
-		Justification = "Not a public method"
-	)]
 	protected override string TransformKey(DelayGetValue.Query request) =>
 		$"DelayGetValue(query: {request.Value})";
 
