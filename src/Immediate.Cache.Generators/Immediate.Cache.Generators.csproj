@@ -41,7 +41,7 @@
 
   <Target Name="GetDependencyTargetPaths" Condition=" '$(TargetFramework)' != 'roslyn4.8' ">
 	<ItemGroup>
-	  <TargetPathWithTargetPlatformMoniker Include="$(PkgScriban)/lib/netstandard2.0/Scriban.dll" IncludeRuntimeDependency="false" />
+	  <TargetPathWithTargetPlatformMoniker Include="$(PkgScriban)/lib/net8.0/Scriban.dll" IncludeRuntimeDependency="false" />
 	</ItemGroup>
   </Target>
 
