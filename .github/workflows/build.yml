@@ -33,6 +33,10 @@ jobs:
 
     - name: Restore dependencies
       run: dotnet restore
+    - name: Inspect dependency chains
+      run: |
+        dotnet nuget why tests/Immediate.Cache.Tests/Immediate.Cache.Tests.csproj Microsoft.Bcl.AsyncInterfaces --framework net8.0
+        dotnet nuget why tests/Immediate.Cache.Tests/Immediate.Cache.Tests.csproj Verify --framework net8.0
     - name: Build
       run: dotnet build -c Release --no-restore
     - name: Test
